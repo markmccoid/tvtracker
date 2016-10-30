@@ -1,6 +1,9 @@
 import React from 'react';
+import { connect } from 'react-redux';
+
 import TVListItem from 'TVListItem';
 import tvMaze from './../api/tvMaze';
+import { loadNewShows, showSelected, setSearchText, setNewShowFlag } from '../actions/actions';
 
 class TVList extends React.Component {
 	constructor(props) {
@@ -13,7 +16,7 @@ class TVList extends React.Component {
 		// }, function (e){
 		// 	console.log(e);
 		// });
-		var { tvShows, onAddShow } = this.props;
+		var { tvShows } = this.props;
 		var getTVListItems;
 
 		if (tvShows.length < 1 || tvShows === undefined) {
@@ -21,7 +24,7 @@ class TVList extends React.Component {
 		} else {
 			getTVListItems = tvShows.map((tvShow) => {
 				return (
-					<TVListItem showName={tvShow.name} showId={tvShow.id} onSelectShow={this.props.onSelectShow} key={tvShow.id}/>
+					<TVListItem showName={tvShow.name} showId={tvShow.id} onSelectShow={this.props.showSelected} key={tvShow.id}/>
 				);
 			});
 		}
@@ -29,13 +32,24 @@ class TVList extends React.Component {
 		return (
 			<div>
 				<ul className="menu">
-					<li><input type="text" ref="txtTVShow" placeholder="TV Show Name" /></li>
-	        <li><button onClick={(event) => {
-	        		event.preventDefault();
-	        		onAddShow(this.refs.txtTVShow.value);
-	        		this.refs.txtTVShow.value = '';
-	        	}}
-	        type="button" className="button">Add</button></li>
+					<li><input
+								type="text"
+								ref="tvSearchText"
+								value={this.props.showSearchTerm}
+								onChange={() => this.props.setSearchText(this.refs.tvSearchText.value)}
+								placeholder="TV Show Name" />
+					</li>
+	        <li><button
+	        			onClick={(event) => {
+									//onAddShow(this.refs.tvSearchText.value);
+									this.props.loadNewShows(this.props.showSearchTerm);
+									this.props.setSearchText('');
+			        		//this.refs.tvSearchText.value = '';
+			        	}}
+	        			type="button"
+	        			className="button">Search
+	        		</button>
+	        </li>
 				</ul>
 				<ul className="menu vertical">
 						{getTVListItems}
@@ -45,4 +59,16 @@ class TVList extends React.Component {
 	}
 };
 
-export default TVList;
+function mapStateToProps(state) {
+	return {
+		tvShows: state.tvShows,
+		showSearchTerm: state.newShowsInfo.showSearchTerm
+	}
+}
+export default connect(mapStateToProps, {
+	loadNewShows,
+	showSelected,
+	setSearchText,
+	setNewShowFlag
+})(TVList);
+

@@ -1,19 +1,30 @@
-var redux = require('redux');
-var { tvShowsReducer, showSelectedReducer, newShowsInfoReducer, addingNewShowReducer }  =  require('../reducers/reducers');
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
+import promise from 'redux-promise';
+import { tvShowsReducer, showSelectedReducer, newShowsInfoReducer } from '../reducers/reducers';
+import helpers from '../helpers/helpers';
+import tvMaze from '../api/tvmaze';
 
+const INITIAL_STATE = {
+			tvShows: tvMaze.loadInitialData(),
+			showSelectedId: undefined,
+			newShowsInfo: {
+				showSearchTerm: '',
+				showsReturned: [],
+				addingNewShow: false
+			}
+		};
 //--------------------------------------------
 //-Create Store
 //--------------------------------------------
-export var configure = (initialState = {}) => {
+export var configure = (initialState = INITIAL_STATE) => {
 
-	var reducer = redux.combineReducers({
+	var reducer = combineReducers({
 			tvShows: tvShowsReducer,
-			showSelected: showSelectedReducer,
-			newShowsInfo: newShowsInfoReducer,
-			addingNewShow: addingNewShowReducer
+			showSelectedId: showSelectedReducer,
+			newShowsInfo: newShowsInfoReducer
 	});
 
-	var store = redux.createStore(reducer, initialState, redux.compose(
+	var store = createStore(reducer, initialState, compose(applyMiddleware(promise),
 			window.devToolsExtension ? window.devToolsExtension() : f => f));
 
 	return store;

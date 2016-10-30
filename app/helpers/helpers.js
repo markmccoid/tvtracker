@@ -1,4 +1,42 @@
 export default  {
+	getCurrentDateString: () => {
+		var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth()+1; //January is 0!
+		var yyyy = today.getFullYear();
+
+		if(dd<10) {
+		    dd='0'+dd
+		}
+
+		if(mm<10) {
+		    mm='0'+mm
+		}
+
+		return yyyy+'-'+mm+'-'+dd;
+	},
+	//-------------------------------------
+	//-Gets current date, without any time component
+	//-use .valueOf() to convert to number for comparisons
+	//-Best not to use == if comparing objects
+	//-------------------------------------
+	getCurrentDateObject: () => {
+		var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth()+1; //January is 0!
+		var yyyy = today.getFullYear();
+
+		if(dd<10) {
+		    dd='0'+dd
+		}
+
+		if(mm<10) {
+		    mm='0'+mm
+		}
+
+		return new Date(yyyy+'-'+mm+'-'+dd);
+	},
+
 	initData: [
 							{
 								"id" : 580,
@@ -386,8 +424,8 @@ export default  {
 									}
 								],
 								"downloading" : {
-									"seasonDownloading" : 1,
-									"episodeDownloading" : 1
+									"seasonDownloading" : 4,
+									"episodeDownloading" : 11
 								},
 								"watching" : {
 									"seasonWatching" : 1,

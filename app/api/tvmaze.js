@@ -21,7 +21,7 @@ module.exports = {
 		// console.log(requestUrl);
 
 		return axios.get(requestUrl).then(function(res){
-				return res.data;
+				return res.data.map((obj) => obj.show);
 		}, function(res){
 			throw new Error(res);
 		});
@@ -48,9 +48,28 @@ module.exports = {
 			axios.get(`${requestUrl}/episodes`)
 			])
 			.then(axios.spread(function(showInfoResponse, episodeResponse){
-				var showData = showInfoResponse.data;
+				var showDataTemp = showInfoResponse.data;
 				var episodeData = episodeResponse.data;
 				var epObj;
+
+				//Deal with null images
+				var image = showDataTemp.image || {medium: './images/placeholder.png'};
+				var showImage = image.medium;
+
+				//Build showData object.  Pull off pieces from resonse that we want
+				var showData = {
+					id: showDataTemp.id,
+					name: showDataTemp.name,
+					summary: showDataTemp.summary,
+					genres: showDataTemp.genres,
+					status: showDataTemp.status,
+					runtime: showDataTemp.runtime,
+					premiered: showDataTemp.premiered,
+					dayAired: showDataTemp.dayAired,
+					image: showImage,
+					seasons: showDataTemp.seasons
+				};
+
 				//Get array of unique seasons
 				var seasons = _.uniq(episodeData.map((episode) => {
 					return (episode.season);
@@ -83,10 +102,47 @@ module.exports = {
 					return seasonObj;
 				});
 				//Last step is to return the show data and the seasonData that we build above.
-				return ({showData: showData,
-								seasonData: seasonArray} );
+				//unpack the showData object so we have
+				// - Data from tvMaze API
+				// - seasonsDetail node data
+				// - create empty downloading and watching objects
+				return (	{	...showData,
+										seasonData: seasonArray,
+										downloading: {
+											seasonDownloading: 1,
+											episodeDownloading: 1
+										},
+										watching: {
+											seasonWatching: 1,
+											episodeWatching: 1
+										}
+									} );
 
 			}));
+	},
+
+	loadInitialData: function () {
+		var stringtvShows = localStorage.getItem('tvShows');
+		var tvShows = [];
+
+		try {
+			if ( tvShows === null ) {
+				return [];
+			} else {
+				tvShows = JSON.parse(stringtvShows);
+			}
+		} catch (e) {
+			alert("error loading TVShows from localStorage: ", e);
+		}
+		console.log(tvShows);
+		return Array.isArray(tvShows) ? tvShows : [];
+	},
+
+	saveShowData: function (tvShows) {
+		if (Array.isArray(tvShows)) {
+			localStorage.setItem('tvShows', JSON.stringify(tvShows));
+			return tvShows;
+		}
 	}
 }
 

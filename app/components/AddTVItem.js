@@ -1,8 +1,23 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { addShowById, setNewShowFlag, showSelected } from '../actions/actions';
 
 class AddTVItem extends React.Component {
 	constructor(props) {
 		super(props);
+	}
+
+	onAddShowSelect(selectedShowId) {
+		//Check to see if already in our state object:
+		if ( this.props.tvShows.length !== 0) {
+			if ( this.props.tvShows.filter((show) => show.id === selectedShowId).length > 0 ) {
+				alert ("Show already in your list");
+				return null;  //Need to actually do something here...probably update state and rerender...
+			}
+		}
+		this.props.addShowById(selectedShowId);
+		//this.props.showSelected(selectedShowId);
+		//this.props.setNewShowFlag(false);
 	}
 
 	render() {
@@ -39,7 +54,7 @@ class AddTVItem extends React.Component {
 						</div>
 						<div className="row">
 							<div className="columns small-12 medium-12 small-centered">
-								<a href="#" onClick={() => this.props.onAddShowSelect(id)} className="expanded button">Select This Show</a>
+								<a href="#" onClick={() => this.onAddShowSelect(id)} className="expanded button">Select This Show</a>
 							</div>
 						</div>
 					</div>
@@ -48,5 +63,13 @@ class AddTVItem extends React.Component {
 		);
 	}
 }
-
-export default AddTVItem;
+function mapStateToProps(state) {
+	return {
+		tvShows: state.tvShows
+	};
+}
+export default connect(mapStateToProps, {
+	addShowById,
+	setNewShowFlag,
+	showSelected
+})(AddTVItem);
