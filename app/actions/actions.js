@@ -46,6 +46,7 @@ export var loadNewShows = (searchTerm) => {
 //Since we are sending a searchTerm also, the promise middleware
 //doesn't do anything.  Therefore, I'm doing a .then in the reduce to
 //get the final values.
+
 	return {
 		type: LOAD_NEWSHOWS,
 		payload: payload

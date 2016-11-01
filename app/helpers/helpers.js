@@ -36,7 +36,11 @@ export default  {
 
 		return new Date(yyyy+'-'+mm+'-'+dd);
 	},
-
+	//Export the tvShow object -- how to get data into navbar??
+	exportData: (data) => {
+		var jsonData = JSON.stringify(data);
+		console.log(jsonData);
+	},
 	initData: [
 							{
 								"id" : 580,

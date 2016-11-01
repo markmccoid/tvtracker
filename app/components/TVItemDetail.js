@@ -4,52 +4,41 @@ import { onDownloadChange, deleteShow, onWatchingChange } from '../actions/actio
 var alertify = require('alertifyjs');
 import helpers from '../helpers/helpers';
 
-class TVItemDetail extends React.Component {
-	constructor(props) {
-		super(props);
-	}
-	onDeleteShow(showId, showName) {
-		alertify.confirm('', `Confirm Deletion of ${showName}`,
-										() => {
-											this.props.deleteShow(showId);
-											alertify.success(`Deleted ${showName}`);
-										},
-                		() => {
-                			alertify.error(`Canceled delete of ${showName}`)
-                		});
-		//this.props.deleteShow(showId);
-	}
+const TVItemDetail = ({ tvShow, showSelectedId, onDownloadChange, deleteShow, onWatchingChange }) => {
 
-	render() {
-		const { tvShows, showSelectedId, onDownloadChange} = this.props;
-		//if now showSelected in props, then don't render this section
-		//In future could render a default show or put some other "temp" JSX
-		//console.log('Detail: ShowSelectedId:', showSelectedId);
-		if (showSelectedId.length === 0) {
-			return null;
-		}
+  if (!tvShow) {
+  	return <div></div>
+  }
+	var onDeleteShow = (showId, showName) => {
+	alertify.confirm('', `Confirm Deletion of ${showName}`,
+									() => {
+										deleteShow(showId);
+										alertify.success(`Deleted ${showName}`);
+									},
+              		() => {
+              			alertify.error(`Canceled delete of ${showName}`)
+              		});
+	};
 
-		//the tvShow object is sending all of the tvShows, must pick out the one selected by filtering
-		//using the passed this.props.showSelected.showSelectedId.
-
-		if (this.props.tvShows.length === 0) {
-			return <div> Loading...</div>
-		}
-
-		//get the currently selected show data
-		var tvShow = this.props.tvShows.filter((show) => show.id === showSelectedId)[0];
 		//Loop through selected show and find episode airing after or on today
 		const currentDateValue = helpers.getCurrentDateObject().valueOf();
 		var episodesAfterToday = tvShow.seasonData[tvShow.seasonData.length-1].episodeDetail.filter((episode) => {
 			let epDateValue = new Date(episode.episodeAirDate).valueOf();
 			return epDateValue >= currentDateValue;
 		});
-		//grab the first episode in the array (the next one to show) Display in render below
-		const nextEpisodeObj = {date: episodesAfterToday[0].episodeAirDate, number: episodesAfterToday[0].episodeNumber};
-		// var episodeDate = new Date(tvShow.seasonData[tvShow.seasonData.length-1].episodeDetail[4].episodeAirDate).valueOf();
-		// console.log('TVItemDetail: ', tvShow.name, tvShow.seasonData[tvShow.seasonData.length-1].episodeDetail[4].episodeAirDate);
-		// console.log(helpers.getCurrentDateObject().valueOf(), helpers.getCurrentDateString(), episodeDate);
-		//-------------------------
+
+		var nextEpisodeObj;
+		if ( episodesAfterToday.length === 0 ) {  //if this array (build above) returns 0, then there are no episodes after today.  return a blank object
+			nextEpisodeObj = {date: '', number: ''};
+		} else {
+			//grab the first episode in the array (the next one to show) Display in render below
+			nextEpisodeObj = {date: episodesAfterToday[0].episodeAirDate, number: episodesAfterToday[0].episodeNumber};
+			// var episodeDate = new Date(tvShow.seasonData[tvShow.seasonData.length-1].episodeDetail[4].episodeAirDate).valueOf();
+			// console.log('TVItemDetail: ', tvShow.name, tvShow.seasonData[tvShow.seasonData.length-1].episodeDetail[4].episodeAirDate);
+			// console.log(helpers.getCurrentDateObject().valueOf(), helpers.getCurrentDateString(), episodeDate);
+			//-------------------------
+		}
+
 		var downloadingJSX =
 				<div className="callout" style={{paddingTop:0, paddingBottom: 0}}>
 					<div className="row">
@@ -66,7 +55,7 @@ class TVItemDetail extends React.Component {
 							<input
 								type="text"
 								value={tvShow.downloading.seasonDownloading}
-								onChange={(event) => this.props.onDownloadChange('s', event.target.value, showSelectedId)}
+								onChange={(event) => onDownloadChange('s', event.target.value, showSelectedId)}
 								/>
 						</div>
 						<div className="columns medium-3">
@@ -74,7 +63,7 @@ class TVItemDetail extends React.Component {
 							<input
 								type="text"
 								value={tvShow.downloading.episodeDownloading}
-								onChange={(event) => this.props.onDownloadChange('e', event.target.value, showSelectedId)}
+								onChange={(event) => onDownloadChange('e', event.target.value, showSelectedId)}
 								/>
 						</div>
 
@@ -83,7 +72,7 @@ class TVItemDetail extends React.Component {
 							<input
 								type="text"
 								value={tvShow.watching.seasonWatching}
-								onChange={(event) => this.props.onWatchingChange('s', event.target.value, showSelectedId)}
+								onChange={(event) => onWatchingChange('s', event.target.value, showSelectedId)}
 								/>
 						</div>
 						<div className="columns medium-3">
@@ -91,11 +80,15 @@ class TVItemDetail extends React.Component {
 							<input
 								type="text"
 								value={tvShow.watching.episodeWatching}
-								onChange={(event) => this.props.onWatchingChange('e', event.target.value, showSelectedId)}
+								onChange={(event) => onWatchingChange('e', event.target.value, showSelectedId)}
 								/>
 						</div>
 					</div>
 				</div>;
+				var nextEpisodeBlock = <div className="columns small-4 callout small secondary">
+								<p className="detail-title">Next Episode</p>
+								<p>{nextEpisodeObj.date} | {nextEpisodeObj.number}</p>
+							</div>;
 		return (
 			<div>
 				<span>Show Selected: {showSelectedId}</span>
@@ -106,7 +99,7 @@ class TVItemDetail extends React.Component {
 								<img src={tvShow.image} />
 							</div>
 							<div className="columns medium-12">
-								<a href="#" onClick={()=> this.onDeleteShow(showSelectedId, tvShow.name)} className="button alert">Delete</a>
+								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.name)} className="button alert">Delete</a>
 							</div>
 						</div>
 					</div>
@@ -120,10 +113,7 @@ class TVItemDetail extends React.Component {
 								<p className="detail-title">Status</p>
 								<p>{tvShow.status}</p>
 							</div>
-							<div className="columns small-4 callout small secondary">
-								<p className="detail-title">Next Episode</p>
-								<p>{nextEpisodeObj.date} | {nextEpisodeObj.number}</p>
-							</div>
+							{nextEpisodeObj.date === '' ? '' : nextEpisodeBlock}
 						</div>
 						<div className="row">
 							<div className="columns small-12">
@@ -136,18 +126,10 @@ class TVItemDetail extends React.Component {
 				{downloadingJSX}
 			</div>
 		);
-	}
+	};
 
-};
-
-function mapStateToProps(state) {
-	return {
-		tvShows: state.tvShows,
-		showSelectedId: state.showSelectedId
-	}
-}
-
-export default connect(mapStateToProps, {
+// export default TVItemDetail;
+export default connect(null, {
 	onDownloadChange,
 	deleteShow,
 	onWatchingChange

@@ -21,19 +21,21 @@ class MainDisplay extends React.Component {
 		var detailPane = () => {
 //			console.log(this.props.tvShows, this.props.showSelectedId);
 			if (this.props.newShowsInfo.addingNewShow) {
-				console.log('addTVShow');
-				return <AddTVShow shows={this.props.newShowsInfo.showsReturned} onAddShowSelect={this.onAddShowSelect}/>
+				//console.log('addTVShow');
+				return <AddTVShow shows={this.props.newShowsInfo.showsReturned} />
 			} else {
-
-				return <TVItemDetail onDownloadChange={this.onDownloadChange}/>
+				var tvShow = this.props.tvShows.filter((show) => show.id === this.props.showSelectedId)[0];
+				//console.log('TVItemDetail', tvShow);
+				var dl = !tvShow ? '' : tvShow.downloading;
+				return <TVItemDetail tvShow={tvShow} showSelectedId={this.props.showSelectedId} dl={dl}/>
 			}
 		}
 		return (
 			<div className="row">
-				<div className="columns small-4">
+				<div className="columns small-4" style={{paddingRight: "0"}}>
 					<TVList tvShows={ this.props.tvShows } />
 				</div>
-				<div className="columns">
+				<div className="columns callout secondary">
 					{detailPane()}
 				</div>
 			</div>

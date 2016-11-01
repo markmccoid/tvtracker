@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 import TVListItem from 'TVListItem';
 import tvMaze from './../api/tvMaze';
-import { loadNewShows, showSelected, setSearchText, setNewShowFlag } from '../actions/actions';
+import { loadNewShows, showSelected, addingNewShow, setNewShowFlag } from '../actions/actions';
 
 class TVList extends React.Component {
 	constructor(props) {
@@ -30,27 +30,20 @@ class TVList extends React.Component {
 		}
 
 		return (
-			<div>
-				<ul className="menu">
-					<li><input
-								type="text"
-								ref="tvSearchText"
-								value={this.props.showSearchTerm}
-								onChange={() => this.props.setSearchText(this.refs.tvSearchText.value)}
-								placeholder="TV Show Name" />
-					</li>
-	        <li><button
+			<div className="callout secondary" style={{height:"100%"}}>
+				<div>
+	        <div><button
 	        			onClick={(event) => {
-									//onAddShow(this.refs.tvSearchText.value);
-									this.props.loadNewShows(this.props.showSearchTerm);
-									this.props.setSearchText('');
-			        		//this.refs.tvSearchText.value = '';
+	        				//Set add new show flag to true
+									this.props.setNewShowFlag(true);
 			        	}}
 	        			type="button"
-	        			className="button">Search
+	        			className="button expanded">
+	        			Add New Show
 	        		</button>
-	        </li>
-				</ul>
+	        </div>
+				</div>
+				<hr />
 				<ul className="menu vertical">
 						{getTVListItems}
 				</ul>
@@ -68,7 +61,7 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, {
 	loadNewShows,
 	showSelected,
-	setSearchText,
+	addingNewShow,
 	setNewShowFlag
 })(TVList);
 

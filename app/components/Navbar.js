@@ -1,17 +1,24 @@
 import React from 'react';
+//require exportData = '../helpers/helpers/exportData';
+import helpers from '../helpers/helpers';
 
 var Navbar = () => {
 	return (
-		<div className="top-bar" data-topbar role="navigation">
-			<div className="top-bar-left">
-				<span className="title">TV Tracker</span>
+		<div className="row">
+		<div className="columns ">
+			<div className="top-bar" data-topbar role="navigation">
+				<div className="top-bar-left">
+					<span className="title">TV Tracker</span>
+				</div>
+				<div className="top-bar-right">
+		      <ul className="menu">
+		        <li><input type="search" placeholder="Search" /></li>
+		        <li><button type="button" className="button">Search</button></li>
+		        <li><button type="button" className="button" onClick={() => helpers.exportData()}>Export</button></li>
+		      </ul>
+		    </div>
 			</div>
-			<div className="top-bar-right">
-	      <ul className="menu">
-	        <li><input type="search" placeholder="Search" /></li>
-	        <li><button type="button" className="button">Search</button></li>
-	      </ul>
-	     </div>
+		</div>
 		</div>
 	);
 };

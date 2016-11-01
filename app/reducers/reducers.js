@@ -1,4 +1,5 @@
 import { LOAD_NEWSHOWS, SHOW_SELECTED, SET_SEARCH_TEXT, SET_ADD_NEW_SHOW, ADD_SHOW_BY_ID, ON_DL_FORM_CHANGE, ON_DELETE_SHOW, ON_WATCHING_FORM_CHANGE } from '../actions/actions';
+import df from 'deep-freeze-strict';
 
 export var tvShowsReducer = (state = [], action) => {
 	console.log(action.type);
@@ -8,50 +9,53 @@ export var tvShowsReducer = (state = [], action) => {
 			return [...state, action.payload];
 		case ON_DL_FORM_CHANGE:
 			var { type, value, showSelected } = action.action;
-			return state.map((show) => {
-				if( show.id === showSelected) {
-					if (type === 's') {
-						show.downloading.seasonDownloading = value;
-					} else {
-						show.downloading.episodeDownloading = value;
-					}
-				}
-				return show;
-			});
-//-----------------------------------
-//--This is another way to do the above.  I think this is a bit more complicated, but just a FYI
-//-----------------------------------
-			// var idx = state.findIndex((show) => {return show.id === showSelected});
-			// //create new item for changed object in array -- NOTE: slice returns an array.
-			// //Here there will only be a single object in the array.
-			// var updatedObject = state.slice(idx, idx+1);
-			// //check the type 'e' is for episode updating and 's' is for season updating.
-			// if (type === 'e') {
-			// 	updatedObject[0].downloading.episodeDownloading = value;
-			// } else if (type === 's') {
-			// 	updatedObject[0].downloading.seasonDownloading = value;
-			// }
+			var idx = state.findIndex((show) => {return show.id === showSelected});
+			//create new item for changed object in array -- NOTE: slice returns an array.
+			//Here there will only be a single object in the array, so grab the first/only one which is index 0.
+			var showToUpdate = state.slice(idx, idx+1)[0];
+			var updatedShow;
+			//check the type 'e' is for episode updating and 's' is for season updating.
+			if (type === 'e') {
+				//Even though showToUpdate is a new array, it contains sub-objects, downloading being one of them.
+				//These sub object are STILL pointing to the original state object, thus, if we update anything in
+				//these sub objects, we will be mutating the original object.
+				//So to keep this from happening we are doing all the shit below!
+				updatedShow = [{...showToUpdate, downloading: {...showToUpdate.downloading, episodeDownloading: value}}];
+			} else if (type === 's') {
+				updatedShow = [{...showToUpdate, downloading: {...showToUpdate.downloading, seasonDownloading: value}}];
+			}
 
-			// return [
-			// 	...state.slice(0,idx),
-			// 	//Modify this selected array piece without mutating it????
-			// 	...updatedObject,
-			// 	...state.slice(idx+1)
-			// ];
+			return [
+				...state.slice(0,idx),
+				//Modify this selected array piece without mutating it????
+				...updatedShow,
+				...state.slice(idx+1)
+			];
 //-----------------------------------
 		case ON_WATCHING_FORM_CHANGE:
 			var { type, value, showSelected } = action.action;
-			console.log(type, value, showSelected);
-			return state.map((show) => {
-				if( show.id === showSelected) {
-					if (type === 's') {
-						show.watching.seasonWatching = value;
-					} else {
-						show.watching.episodeWatching = value;
-					}
-				}
-				return show;
-			});
+			var idx = state.findIndex((show) => {return show.id === showSelected});
+			//create new item for changed object in array -- NOTE: slice returns an array.
+			//Here there will only be a single object in the array, so grab the first/only one which is index 0.
+			var showToUpdate = state.slice(idx, idx+1)[0];
+			var updatedShow;
+			//check the type 'e' is for episode updating and 's' is for season updating.
+			if (type === 'e') {
+				//Even though showToUpdate is a new array, it contains sub-objects, downloading being one of them.
+				//These sub object are STILL pointing to the original state object, thus, if we update anything in
+				//these sub objects, we will be mutating the original object.
+				//So to keep this from happening we are doing all the shit below!
+				updatedShow = [{...showToUpdate, watching: {...showToUpdate.watching, episodeWatching: value}}];
+			} else if (type === 's') {
+				updatedShow = [{...showToUpdate, watching: {...showToUpdate.watching, seasonWatching: value}}];
+			}
+
+			return [
+				...state.slice(0,idx),
+				//Modify this selected array piece without mutating it????
+				...updatedShow,
+				...state.slice(idx+1)
+			];
 		case ON_DELETE_SHOW:
 			var showId = action.payload;
 			console.log('in reducer: ', showId);
