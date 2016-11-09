@@ -18,7 +18,6 @@ class AddTVShow extends React.Component {
 		//Variable to hold the List of shows or a loading statement
 		var buildTVList;
 		//Make sure shows props has something in it, if so map over the shows and create an AddTVItem for each one.
-		console.log(this.props);
 		if(this.props.shows) {
 			buildTVList = this.props.shows.map((show) => {
 				return <AddTVItem show={show} key={show.id} />

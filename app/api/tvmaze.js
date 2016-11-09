@@ -1,4 +1,6 @@
 var axios = require('axios');
+import firebase, { firebaseRef } from '../firebase';
+
 import _ from 'lodash';
 
 const TVMAZESHOWSEARCH_URL = 'http://api.tvmaze.com/search/shows';
@@ -65,9 +67,9 @@ module.exports = {
 					status: showDataTemp.status,
 					runtime: showDataTemp.runtime,
 					premiered: showDataTemp.premiered,
-					dayAired: showDataTemp.dayAired,
+					dayAired: showDataTemp.dayAired === undefined ? null : showDataTemp.dayAired,
 					image: showImage,
-					seasons: showDataTemp.seasons
+					seasons: showDataTemp.seasons === undefined ? null : showDataTemp.seasons
 				};
 
 				//Get array of unique seasons
@@ -107,15 +109,7 @@ module.exports = {
 				// - seasonsDetail node data
 				// - create empty downloading and watching objects
 				return (	{	...showData,
-										seasonData: seasonArray,
-										downloading: {
-											seasonDownloading: 1,
-											episodeDownloading: 1
-										},
-										watching: {
-											seasonWatching: 1,
-											episodeWatching: 1
-										}
+										seasonData: seasonArray
 									} );
 
 			}));
@@ -134,15 +128,38 @@ module.exports = {
 		} catch (e) {
 			alert("error loading TVShows from localStorage: ", e);
 		}
-		console.log(tvShows);
 		return Array.isArray(tvShows) ? tvShows : [];
 	},
 
-	saveShowData: function (tvShows) {
-		if (Array.isArray(tvShows)) {
-			localStorage.setItem('tvShows', JSON.stringify(tvShows));
-			return tvShows;
-		}
-	}
+	loadInitialData: function () {
+		var stringShowData = localStorage.getItem('showData');
+		var showData = [];
+
+		var showDataArray;
+		var tvShowsArray;
+		return firebaseRef.once('value').then((snap) => {
+			var snapData = snap.val().showData;
+			var tvData = snap.val().tvShows;
+			showDataArray = Object.keys(snapData).map((objKey) => {
+				return {...snapData[objKey], firebaseKey: objKey};
+			});
+			tvShowsArray = Object.keys(tvData).map((objKey) => {
+				return {...tvData[objKey], firebaseKey: objKey};
+			});
+			return {tvShows: tvShowsArray, showData: showDataArray};
+		});
+
+		// try {
+		// 	if ( stringShowData === null ) {
+		// 		return [];
+		// 	} else {
+		// 		showData = JSON.parse(stringShowData);
+		// 	}
+		// } catch (e) {
+		// 	alert ("error loading showData from localStorage: ", e);
+		// }
+		// console.log(showData);
+		// return Array.isArray(showData) ? showData : [];
+	},
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { addShowById, setNewShowFlag, showSelected } from '../actions/actions';
+import { addShowById, setNewShowFlag, showSelected, startAddShowById } from '../actions/actions';
 
 class AddTVItem extends React.Component {
 	constructor(props) {
@@ -15,7 +15,9 @@ class AddTVItem extends React.Component {
 				return null;  //Need to actually do something here...probably update state and rerender...
 			}
 		}
-		this.props.addShowById(selectedShowId);
+
+		console.log(this.props.startAddShowById);
+		this.props.startAddShowById(selectedShowId);
 		//this.props.showSelected(selectedShowId);
 		//this.props.setNewShowFlag(false);
 	}
@@ -71,5 +73,6 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, {
 	addShowById,
 	setNewShowFlag,
-	showSelected
+	showSelected,
+	startAddShowById
 })(AddTVItem);

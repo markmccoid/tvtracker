@@ -52,13 +52,13 @@ class TVList extends React.Component {
 	}
 };
 
-function mapStateToProps(state) {
-	return {
-		tvShows: state.tvShows,
-		showSearchTerm: state.newShowsInfo.showSearchTerm
-	}
-}
-export default connect(mapStateToProps, {
+// function mapStateToProps(state) {
+// 	return {
+// 		tvShows: state.tvShows,
+// 		showSearchTerm: state.newShowsInfo.showSearchTerm
+// 	}
+// }
+export default connect(null, {
 	loadNewShows,
 	showSelected,
 	addingNewShow,

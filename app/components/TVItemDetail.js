@@ -1,18 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { onDownloadChange, deleteShow, onWatchingChange } from '../actions/actions';
+import { startDeleteShow } from '../actions/actions';
 var alertify = require('alertifyjs');
-import helpers from '../helpers/helpers';
 
-const TVItemDetail = ({ tvShow, showSelectedId, onDownloadChange, deleteShow, onWatchingChange }) => {
+import helpers from '../helpers/helpers';
+import TVUserData from 'TVUserData';
+
+const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, showData }) => {
 
   if (!tvShow) {
   	return <div></div>
   }
-	var onDeleteShow = (showId, showName) => {
+	var onDeleteShow = (showId, tvShowFirebaseKey, showDataFirebaseKey, showName) => {
 	alertify.confirm('', `Confirm Deletion of ${showName}`,
 									() => {
-										deleteShow(showId);
+										startDeleteShow(showId, tvShowFirebaseKey, showDataFirebaseKey);
 										alertify.success(`Deleted ${showName}`);
 									},
               		() => {
@@ -39,52 +41,7 @@ const TVItemDetail = ({ tvShow, showSelectedId, onDownloadChange, deleteShow, on
 			//-------------------------
 		}
 
-		var downloadingJSX =
-				<div className="callout" style={{paddingTop:0, paddingBottom: 0}}>
-					<div className="row">
-						<div className="column small-6">
-							<h4 className="text-center">Downloading</h4>
-						</div>
-						<div className="column small-6" style={{borderLeft:"1px solid #ccc"}}>
-							<h4 className="text-center">Watching</h4>
-						</div>
-					</div>
-					<div className="row">
-						<div className="columns medium-3">
-							<p className="detail-title">Season DL</p>
-							<input
-								type="text"
-								value={tvShow.downloading.seasonDownloading}
-								onChange={(event) => onDownloadChange('s', event.target.value, showSelectedId)}
-								/>
-						</div>
-						<div className="columns medium-3">
-							<p className="detail-title">Episode DL</p>
-							<input
-								type="text"
-								value={tvShow.downloading.episodeDownloading}
-								onChange={(event) => onDownloadChange('e', event.target.value, showSelectedId)}
-								/>
-						</div>
 
-						<div className="columns medium-3" style={{borderLeft:"1px solid #ccc"}}>
-							<p className="detail-title">Season Watching</p>
-							<input
-								type="text"
-								value={tvShow.watching.seasonWatching}
-								onChange={(event) => onWatchingChange('s', event.target.value, showSelectedId)}
-								/>
-						</div>
-						<div className="columns medium-3">
-							<p className="detail-title">Episode Watching</p>
-							<input
-								type="text"
-								value={tvShow.watching.episodeWatching}
-								onChange={(event) => onWatchingChange('e', event.target.value, showSelectedId)}
-								/>
-						</div>
-					</div>
-				</div>;
 				var nextEpisodeBlock = <div className="columns small-4 callout small secondary">
 								<p className="detail-title">Next Episode</p>
 								<p>{nextEpisodeObj.date} | {nextEpisodeObj.number}</p>
@@ -99,7 +56,7 @@ const TVItemDetail = ({ tvShow, showSelectedId, onDownloadChange, deleteShow, on
 								<img src={tvShow.image} />
 							</div>
 							<div className="columns medium-12">
-								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.name)} className="button alert">Delete</a>
+								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.firebaseKey, showData.firebaseKey, tvShow.name)} className="button alert">Delete</a>
 							</div>
 						</div>
 					</div>
@@ -123,14 +80,14 @@ const TVItemDetail = ({ tvShow, showSelectedId, onDownloadChange, deleteShow, on
 						</div>
 					</div>
 				</div>
-				{downloadingJSX}
+
+				<TVUserData showData={showData} />
+
 			</div>
 		);
 	};
 
 // export default TVItemDetail;
 export default connect(null, {
-	onDownloadChange,
-	deleteShow,
-	onWatchingChange
+	startDeleteShow
 })(TVItemDetail);

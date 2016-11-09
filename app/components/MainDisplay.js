@@ -25,9 +25,10 @@ class MainDisplay extends React.Component {
 				return <AddTVShow shows={this.props.newShowsInfo.showsReturned} />
 			} else {
 				var tvShow = this.props.tvShows.filter((show) => show.id === this.props.showSelectedId)[0];
+				var showData = this.props.showData.filter((showData) => showData.showId === this.props.showSelectedId)[0];
 				//console.log('TVItemDetail', tvShow);
 				var dl = !tvShow ? '' : tvShow.downloading;
-				return <TVItemDetail tvShow={tvShow} showSelectedId={this.props.showSelectedId} dl={dl}/>
+				return <TVItemDetail tvShow={tvShow} showData={showData} showSelectedId={this.props.showSelectedId}/>
 			}
 		}
 		return (
@@ -46,6 +47,7 @@ class MainDisplay extends React.Component {
 function mapStateToProps(state) {
 	return {
 		tvShows: state.tvShows,
+		showData: state.showData,
 		showSelectedId: state.showSelectedId,
 		newShowsInfo: state.newShowsInfo
 	};

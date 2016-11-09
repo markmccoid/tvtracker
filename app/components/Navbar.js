@@ -2,7 +2,7 @@ import React from 'react';
 //require exportData = '../helpers/helpers/exportData';
 import helpers from '../helpers/helpers';
 
-var Navbar = () => {
+var Navbar = (props) => {
 	return (
 		<div className="row">
 		<div className="columns ">
@@ -14,7 +14,7 @@ var Navbar = () => {
 		      <ul className="menu">
 		        <li><input type="search" placeholder="Search" /></li>
 		        <li><button type="button" className="button">Search</button></li>
-		        <li><button type="button" className="button" onClick={() => helpers.exportData()}>Export</button></li>
+		        <li><button type="button" className="button" onClick={() => helpers.exportData(props.tvShows)}>Export</button></li>
 		      </ul>
 		    </div>
 			</div>

@@ -1,6 +1,12 @@
 import { createStore, combineReducers, applyMiddleware, compose, reduxMiddleware } from 'redux';
 import promise from 'redux-promise';
-import { tvShowsReducer, showSelectedReducer, newShowsInfoReducer } from '../reducers/reducers';
+import thunk from 'redux-thunk';
+
+import { newShowsInfoReducer } from '../reducers/newShowsInfoReducer';
+import { tvShowsReducer } from '../reducers/tvShowsReducer';
+import { showSelectedReducer} from '../reducers/showSelectedReducer';
+import { showDataReducer } from '../reducers/showDataReducer';
+
 import helpers from '../helpers/helpers';
 import tvMaze from '../api/tvmaze';
 
@@ -8,10 +14,10 @@ import tvMaze from '../api/tvmaze';
 import freeze from 'redux-freeze';
 
 const INITIAL_STATE = {
-			tvShows: tvMaze.loadInitialData(),
+			tvShows: [],
+			showData: [],
 			showSelectedId: undefined,
 			newShowsInfo: {
-				showSearchTerm: '',
 				showsReturned: [],
 				addingNewShow: false
 			}
@@ -23,11 +29,12 @@ export var configure = (initialState = INITIAL_STATE) => {
 
 	var reducer = combineReducers({
 			tvShows: tvShowsReducer,
+			showData: showDataReducer,
 			showSelectedId: showSelectedReducer,
 			newShowsInfo: newShowsInfoReducer
 	});
 
-	var store = createStore(reducer, initialState, compose(applyMiddleware(promise, freeze),
+	var store = createStore(reducer, initialState, compose(applyMiddleware(promise, thunk, freeze),
 			window.devToolsExtension ? window.devToolsExtension() : f => f));
 
 	return store;
