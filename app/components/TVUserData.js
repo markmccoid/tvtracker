@@ -1,17 +1,21 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { startOnDownloadChange, startOnWatchingChange, startAddUserLink, onLinkDelete } from '../actions/actions';
+import { startOnDownloadChange, startOnWatchingChange, startAddUserLink, startOnLinkDelete } from '../actions/actions';
 import Link from 'Link';
 
 class TVUserData extends React.Component {
 		constructor(props) {
 		super(props);
+	}
 
+	onLinkDelete = (showId, index) => {
+		var showData = this.props.showData;
+		this.props.startOnLinkDelete(showId, index, showData);
 	}
 
 	render() {
-	var { showData, startOnDownloadChange, startOnWatchingChange, onLinkDelete } = this.props;
+	var { showData, startOnDownloadChange, startOnWatchingChange, startOnLinkDelete } = this.props;
 // console.log(this.props.showData.showLinks);
 // console.log(this.props);
 	var downloadingJSX =
@@ -67,7 +71,7 @@ class TVUserData extends React.Component {
 						e.preventDefault();
 						var link = this.refs.link.value.trim();
 						var linkDescription = this.refs.linkDesc.value.trim();
-
+console.log(showData,this.refs.link.value, this.refs.linkDesc.value);
 						if ( link.length > 0 && linkDescription.length > 0) {
 							this.props.startAddUserLink(showData, this.refs.link.value, this.refs.linkDesc.value);
 						}
@@ -105,7 +109,7 @@ class TVUserData extends React.Component {
 									index={idx}
 									showSelected={showData.showId}
 									key={idx}
-									onLinkDelete={onLinkDelete}/>
+									onLinkDelete={this.onLinkDelete}/>
 
 					);
 				})}
@@ -124,6 +128,6 @@ export default connect(null, {
 	startOnDownloadChange,
 	startOnWatchingChange,
 	startAddUserLink,
-	onLinkDelete
+	startOnLinkDelete
 })(TVUserData);
 

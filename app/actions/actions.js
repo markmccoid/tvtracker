@@ -35,22 +35,22 @@ export function addShowById(showObj) {
 
 //Called from AddTVItem.js and will ultimately call the addShowById action creator
 export var startAddShowById= (showId) => {
-	//Create the show data initialization object
-	var showDataInit = {
-		showId: showId,
-		seasonDownloading: 1,
-		episodeDownloading: 1,
-		seasonWatching: 1,
-		episodeWatching: 1,
-		showLinks: []
-	};
+
 	//Return thunk --
 	return (dispatch, getState) => {
 		var request = tvMaze.getTVInfoAndEpisodes(showId);
-
 		//once tvMaze data comes back "then"
 		return request.then((showObj) => {
-
+			//Create the show data initialization object
+			var showDataInit = {
+				showId: showId,
+				seasonDownloading: 1,
+				episodeDownloading: 1,
+				seasonWatching: 1,
+				episodeWatching: 1,
+				showLinks: [{link:showObj.imdbLink,
+											linkDescription: `IMDB Entry for ${showObj.name}`}]
+			};
 			var tvShowRef = firebaseRef.child('tvShows').push(showObj);
 			var showDataRef = firebaseRef.child('showData').push(showDataInit);
 			Promise.all([tvShowRef, showDataRef]).then((values) => {
@@ -188,11 +188,10 @@ export var startDeleteShow = (showId, tvShowFirebaseKey, showDataFirebaseKey) =>
 }
 //-----------------------------------------------
 //------- ADD USER LINK GROUP ------------
-export var addUserLink = (showSelected, link, linkDesc) => {
+export var addUserLinks = (showSelected, newLinksArray) => {
 	var action = {
 		showSelected,
-		link,
-		linkDesc
+		newLinksArray
 	};
 
 	return {
@@ -202,7 +201,8 @@ export var addUserLink = (showSelected, link, linkDesc) => {
 }
 
 export var startAddUserLink = (showData, link, linkDesc) => {
-	const { showId, firebaseKey, showLinks } = showData;
+	const { showId, firebaseKey, showLinks = [] } = showData;
+
 	//create new link object
 	var newLink = {link: link, linkDescription: linkDesc};
 	//add new link onto existing array of link objects for showData.showLinks
@@ -213,12 +213,14 @@ export var startAddUserLink = (showData, link, linkDesc) => {
 	return (dispatch, getState) => {
 		var addLinkRef = firebaseRef.child(`showData/${firebaseKey}`).update({showLinks:newLinkArray});
 		addLinkRef.then(()=> {
-			dispatch(addUserLink(showId, link, linkDesc));
+			//dispatch(addUserLinks(showId, link, linkDesc));
+			dispatch(addUserLinks(showId, newLinkArray));
 		});
-	}
-}
+	};
+};
 //------- END - ADD USER LINK GROUP ------------
 
+//------- DELETE USER LINK GROUP ------------
 export var onLinkDelete = (showSelected, Index) => {
 	var action = {
 		showSelected,
@@ -228,4 +230,21 @@ export var onLinkDelete = (showSelected, Index) => {
 		type: DELETE_USER_LINK,
 		action: action
 	};
-}
+};
+
+export var startOnLinkDelete = (showSelected, Index, showData) => {
+	//showData will be the showData for the show we need to update
+	const { showId, firebaseKey, showLinks } = showData;
+	var newLinksArray = showLinks.filter((obj, idx) => Index !== idx);
+	console.log(newLinksArray);
+	return (dispatch, getState) => {
+		var updLinksRef = firebaseRef.child(`showData/${firebaseKey}`).update({showLinks:newLinksArray});
+
+		updLinksRef.then(() => {
+			dispatch(addUserLinks(showId, newLinksArray));
+		});
+	};
+
+
+};
+//------- END - DELETE USER LINK GROUP ------------

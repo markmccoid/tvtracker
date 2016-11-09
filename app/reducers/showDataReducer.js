@@ -71,23 +71,15 @@ export var showDataReducer = (state = [], action) => {
 			];
 
 		case ADD_USER_LINK:
-			var { showSelected, link, linkDesc } = action.action;
+			var { showSelected, newLinksArray } = action.action;
+			// var { showSelected, link, linkDesc } = action.action;
 
 			//Find show being edited's index
 			var idx = state.findIndex((showData) => {return showData.showId === showSelected});
 			//Get the show data to update ... will be an object
 			var showToUpdate = state.slice(idx, idx+1)[0];
 			//
-			var updatedShowData;
-			//If there are any show links add to them else create a new one.
-			if ( showToUpdate.showLinks) {
-				var linksToUpdate = [...showToUpdate.showLinks];
-				linksToUpdate.push({link: link, linkDescription: linkDesc});
-				updatedShowData = {...showToUpdate, showLinks: [...linksToUpdate]};
-			} else {
-				linksToUpdate = {link: link, linkDescription: linkDesc};
-				updatedShowData = {...showToUpdate, showLinks: [{link: link, linkDescription: linkDesc}]};
-			}
+			var updatedShowData = {...showToUpdate, showLinks: [...newLinksArray]};
 
 			return [
 				...state.slice(0,idx),

@@ -58,6 +58,9 @@ module.exports = {
 				var image = showDataTemp.image || {medium: './images/placeholder.png'};
 				var showImage = image.medium;
 
+				//create an link to the imdb page
+				var imdbLink = `http://www.imdb.com/title/${showDataTemp.externals.imdb}`;
+				console.log('imdblinke', imdbLink);
 				//Build showData object.  Pull off pieces from resonse that we want
 				var showData = {
 					id: showDataTemp.id,
@@ -69,7 +72,8 @@ module.exports = {
 					premiered: showDataTemp.premiered,
 					dayAired: showDataTemp.dayAired === undefined ? null : showDataTemp.dayAired,
 					image: showImage,
-					seasons: showDataTemp.seasons === undefined ? null : showDataTemp.seasons
+					seasons: showDataTemp.seasons === undefined ? null : showDataTemp.seasons,
+					imdbLink: imdbLink
 				};
 
 				//Get array of unique seasons
@@ -135,9 +139,11 @@ module.exports = {
 		var stringShowData = localStorage.getItem('showData');
 		var showData = [];
 
-		var showDataArray;
-		var tvShowsArray;
+		var showDataArray = [];
+		var tvShowsArray = [];
 		return firebaseRef.once('value').then((snap) => {
+			//make sure we have some data if not, return empty arrays
+			if (!snap.val()) { return {tvShows: tvShowsArray, showData: showDataArray};}
 			var snapData = snap.val().showData;
 			var tvData = snap.val().tvShows;
 			showDataArray = Object.keys(snapData).map((objKey) => {

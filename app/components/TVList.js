@@ -10,6 +10,18 @@ class TVList extends React.Component {
 		super(props);
 	}
 
+//Simple sort function to sort the tvShow object array alphabetically by name
+	showSort = (a, b) => {
+	  if (a.name > b.name) {
+	    return 1;
+	  }
+	  if (a.name < b.name) {
+	    return -1;
+	  }
+	  // a must be equal to b
+	  return 0;
+	}
+
 	render() {
 		// tvMaze.getTVInfoById(580).then(function (theData){
 		// 	console.log(theData);
@@ -22,7 +34,7 @@ class TVList extends React.Component {
 		if (tvShows.length < 1 || tvShows === undefined) {
 			getTVListItems =	<div>No Shows</div>
 		} else {
-			getTVListItems = tvShows.map((tvShow) => {
+			getTVListItems = tvShows.sort(this.showSort).map((tvShow) => {
 				return (
 					<TVListItem showName={tvShow.name} showId={tvShow.id} onSelectShow={this.props.showSelected} key={tvShow.id}/>
 				);
