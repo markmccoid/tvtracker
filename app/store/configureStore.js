@@ -6,6 +6,7 @@ import { newShowsInfoReducer } from '../reducers/newShowsInfoReducer';
 import { tvShowsReducer } from '../reducers/tvShowsReducer';
 import { showSelectedReducer} from '../reducers/showSelectedReducer';
 import { showDataReducer } from '../reducers/showDataReducer';
+import { dataLoadingReducer } from '../reducers/dataLoadingReducer';
 
 import helpers from '../helpers/helpers';
 import tvMaze from '../api/tvmaze';
@@ -17,6 +18,7 @@ const INITIAL_STATE = {
 			tvShows: [],
 			showData: [],
 			showSelectedId: undefined,
+			dataLoading: false,
 			newShowsInfo: {
 				showsReturned: [],
 				addingNewShow: false
@@ -31,6 +33,7 @@ export var configure = (initialState = INITIAL_STATE) => {
 			tvShows: tvShowsReducer,
 			showData: showDataReducer,
 			showSelectedId: showSelectedReducer,
+			dataLoading: dataLoadingReducer,
 			newShowsInfo: newShowsInfoReducer
 	});
 

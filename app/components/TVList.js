@@ -29,12 +29,20 @@ class TVList extends React.Component {
 		// 	console.log(e);
 		// });
 		var { tvShows } = this.props;
+		var tvShowsSorted = [...tvShows].sort(this.showSort);
+		var loadingOrEmptyJSX;
 		var getTVListItems;
+		if ( this.props.dataLoading ) {
+			loadingOrEmptyJSX = <li className="text-center"><img src="./images/ajax-loader.gif" /></li>;
+		} else {
+			loadingOrEmptyJSX = <li>No Shows</li>
+		}
 
 		if (tvShows.length < 1 || tvShows === undefined) {
-			getTVListItems =	<div>No Shows</div>
+			getTVListItems =	loadingOrEmptyJSX;
+			//<div>No Shows</div>
 		} else {
-			getTVListItems = tvShows.sort(this.showSort).map((tvShow) => {
+			getTVListItems = tvShowsSorted.map((tvShow) => {
 				return (
 					<TVListItem showName={tvShow.name} showId={tvShow.id} onSelectShow={this.props.showSelected} key={tvShow.id}/>
 				);
@@ -64,16 +72,16 @@ class TVList extends React.Component {
 	}
 };
 
-// function mapStateToProps(state) {
-// 	return {
-// 		tvShows: state.tvShows,
-// 		showSearchTerm: state.newShowsInfo.showSearchTerm
-// 	}
-// }
-export default connect(null, {
-	loadNewShows,
-	showSelected,
-	addingNewShow,
-	setNewShowFlag
-})(TVList);
+function mapStateToProps(state) {
+	return {
+		dataLoading: state.dataLoading
+	}
+}
+
+export default connect(mapStateToProps, {
+		loadNewShows,
+		showSelected,
+		addingNewShow,
+		setNewShowFlag
+	})(TVList);
 

@@ -5,16 +5,19 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 
 import tvMaze from './api/tvmaze';
-import { initializeStore } from './actions/actions';
+import { initializeStore, setDataLoading } from './actions/actions';
 import routes from './routes';
+
 
 //This creates the store that will be passed to the Provider component
 var store = require('./store/configureStore').configure();
 
 //Initialize the tvShow and showData nodes of the store
 //with data from firebase
+store.dispatch(setDataLoading(true));
 tvMaze.loadInitialData().then((data) => {
 	store.dispatch(initializeStore(data));
+	store.dispatch(setDataLoading(false));
 });
 
 // tvMaze.loadInitialShowData().then((data) => {

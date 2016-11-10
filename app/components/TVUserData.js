@@ -1,12 +1,18 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { startOnDownloadChange, startOnWatchingChange, startAddUserLink, startOnLinkDelete } from '../actions/actions';
+import { startOnDownloadChange, startOnWatchingChange, startAddUserLink, startOnLinkDelete, startAddShowNotes } from '../actions/actions';
 import Link from 'Link';
 
 class TVUserData extends React.Component {
 		constructor(props) {
 		super(props);
+
+		this.state = {
+			showAddLink: false,
+			addLinkIcon: './images/TriangleRightBlue.png',
+			tempShowNotes: this.props.showData.showNotes
+		}
 	}
 
 	onLinkDelete = (showId, index) => {
@@ -15,9 +21,49 @@ class TVUserData extends React.Component {
 	}
 
 	render() {
-	var { showData, startOnDownloadChange, startOnWatchingChange, startOnLinkDelete } = this.props;
+	var { showData, startOnDownloadChange, startOnWatchingChange, startOnLinkDelete, startAddShowNotes } = this.props;
 // console.log(this.props.showData.showLinks);
 // console.log(this.props);
+	var addLinkForm =
+				<form onSubmit={(e)=> {
+						e.preventDefault();
+						var link = this.refs.link.value.trim();
+						var linkDescription = this.refs.linkDesc.value.trim();
+
+						if ( link.length > 0 && linkDescription.length > 0) {
+							this.props.startAddUserLink(showData, this.refs.link.value, this.refs.linkDesc.value);
+						}
+						this.refs.link.value = '';
+						this.refs.linkDesc.value = '';
+						this.setState({
+								showAddLink: false,
+								addLinkIcon: this.state.showAddLink ? './images/TriangleRightBlue.png' : './images/TriangleDownBlue.png'
+							});
+					}
+				}>
+			<div className="row align-bottom">
+				<div className="columns medium-2">
+					<button className="button">Add Link</button>
+				</div>
+				<div className="columns medium-5">
+					<label>Link
+					<input
+						type="text"
+						name="link"
+						ref="link" />
+					</label>
+				</div>
+				<div className="columns medium-5">
+					<label>Link Description
+					<input
+						type="text"
+						name="linkDesc"
+						ref="linkDesc" />
+					</label>
+				</div>
+			</div>
+			</form>;
+
 	var downloadingJSX =
 		<div className="callout" style={{paddingTop:0, paddingBottom: 0}}>
 			<div className="row">
@@ -67,40 +113,16 @@ class TVUserData extends React.Component {
 	return (
 		<div>
 			{downloadingJSX}
-			<form onSubmit={(e)=> {
-						e.preventDefault();
-						var link = this.refs.link.value.trim();
-						var linkDescription = this.refs.linkDesc.value.trim();
-console.log(showData,this.refs.link.value, this.refs.linkDesc.value);
-						if ( link.length > 0 && linkDescription.length > 0) {
-							this.props.startAddUserLink(showData, this.refs.link.value, this.refs.linkDesc.value);
-						}
-						this.refs.link.value = '';
-						this.refs.linkDesc.value = '';
+			<a onClick={() => {
+						this.setState({
+							showAddLink: !this.state.showAddLink,
+							addLinkIcon: this.state.showAddLink ? './images/TriangleRightBlue.png' : './images/TriangleDownBlue.png'
+						});
 					}
-				}>
-			<div className="row align-bottom">
-				<div className="columns medium-2">
-					<button className="button">Add Link</button>
-				</div>
-				<div className="columns medium-5">
-					<label>Link
-					<input
-						type="text"
-						name="link"
-						ref="link" />
-					</label>
-				</div>
-				<div className="columns medium-5">
-					<label>Link Description
-					<input
-						type="text"
-						name="linkDesc"
-						ref="linkDesc" />
-					</label>
-				</div>
-			</div>
-			</form>
+				} >
+				<img className="hover-pointer" src={this.state.addLinkIcon} width="32" height="32"/>
+			</a>
+			{this.state.showAddLink ? addLinkForm : null}
 
 				{!this.props.showData.showLinks ? null : this.props.showData.showLinks.map((linkObj, idx) => {
 					return (
@@ -115,10 +137,13 @@ console.log(showData,this.refs.link.value, this.refs.linkDesc.value);
 				})}
 
 			<label> <h5>Show Notes</h5>
-				<textarea rows="2" cols="50">
-
-				</textarea>
+				<textarea rows="2" cols="50"
+					onChange={(e) => this.setState({tempShowNotes: e.target.value})}
+					onBlur={() => startAddShowNotes(this.state.tempShowNotes, showData.showId, showData.firebaseKey)}
+					value={this.state.tempShowNotes}
+					/>
 			</label>
+			<button className="button small" onClick={() => startAddShowNotes(this.state.tempShowNotes, showData.showId, showData.firebaseKey)}>Save Note</button>
 		</div>
 	);
 }
@@ -128,6 +153,7 @@ export default connect(null, {
 	startOnDownloadChange,
 	startOnWatchingChange,
 	startAddUserLink,
-	startOnLinkDelete
+	startOnLinkDelete,
+	startAddShowNotes
 })(TVUserData);
 

@@ -1,4 +1,4 @@
-import { ADD_SHOW_BY_ID, ON_DELETE_SHOW, ON_DL_FORM_CHANGE, ON_WATCHING_FORM_CHANGE, ADD_USER_LINK, DELETE_USER_LINK, INITIALIZE_STORE } from '../actions/actions';
+import { ADD_SHOW_BY_ID, ON_DELETE_SHOW, ON_DL_FORM_CHANGE, ON_WATCHING_FORM_CHANGE, ADD_USER_LINK, DELETE_USER_LINK, INITIALIZE_STORE, ADD_SHOW_NOTES } from '../actions/actions';
 
 export var showDataReducer = (state = [], action) => {
 
@@ -106,7 +106,8 @@ export var showDataReducer = (state = [], action) => {
 				updatedShowData,
 				...state.slice(idx+1)
 				];
-
+		case ADD_SHOW_NOTES:
+			return state;
 		default:
 			return state;
 	}
