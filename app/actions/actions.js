@@ -1,22 +1,39 @@
 import axios from 'axios';
 import tvMaze from 'tvmaze';
-import firebase, { firebaseRef } from 'app/firebase';
+import firebase, { firebaseRef, githubProvider, googleProvider } from 'app/firebase';
 
+//Initialization Actions
 export const INITIALIZE_STORE = 'INITIALIZE_STORE'; //Load initial data from firebase and update the tvShow and showData store objects
 export const SET_DATA_LOADING = 'SET_DATA_LOADING';
 
+//Adding a New Show
 export const ADD_SHOW_BY_ID = 'ADD_SHOW_BY_ID';  //
-export const SET_SEARCH_TEXT = 'SET_SEARCH_TEXT';
-export const SHOW_SELECTED = 'SHOW_SELECTED';
 export const LOAD_NEWSHOWS = 'LOAD_NEWSHOWS';
 export const SET_ADD_NEW_SHOW = 'SET_ADD_NEW_SHOW';
+
+//
+export const SHOW_SELECTED = 'SHOW_SELECTED';
+
+//User Data Actions
 export const ON_DL_FORM_CHANGE = 'ON_DL_FORM_CHANGE'; //When user updates the season and episode downloaded inputs
 export const ON_WATCHING_FORM_CHANGE = 'ON_WATCHING_FORM_CHANGE';
 export const ON_DELETE_SHOW = 'ON_DELETE_SHOW';
-//User Data Actions
 export const ADD_USER_LINK = 'ADD_USER_LINK';
 export const DELETE_USER_LINK = 'DELETE_USER_LINK';
 export const ADD_SHOW_NOTES = 'ADD_SHOW_NOTES';
+
+//Group Actions
+export const ADD_GROUP = 'ADD_GROUP';
+export const DELETE_GROUP = 'DELETE_GROUP';
+export const UPDATE_GROUP = 'UPDATE_GROUP';
+
+//Auth Actions
+export const LOGIN = 'LOGIN';
+export const LOGOUT = 'LOGOUT';
+export const AUTH_WORKING = 'AUTH_WORKING';
+export const AUTH_SUCCESSFUL = 'AUTH_SUCCESSFUL';
+export const AUTH_ERROR = 'AUTH_ERROR';
+export const AUTH_NULL = 'AUTH_NULL';
 
 export function initializeStore(data) {
 	return {
@@ -51,11 +68,15 @@ export var startAddShowById= (showId) => {
 				episodeDownloading: 1,
 				seasonWatching: 1,
 				episodeWatching: 1,
+				showNotes: '',
 				showLinks: [{link:showObj.imdbLink,
-											linkDescription: `IMDB Entry for ${showObj.name}`}]
+											linkDescription: `IMDB Entry for ${showObj.name}`},
+										{link:showObj.downloadLink,
+											linkDescription: `Download ${showObj.name}`}]
 			};
-			var tvShowRef = firebaseRef.child('tvShows').push(showObj);
-			var showDataRef = firebaseRef.child('showData').push(showDataInit);
+			var uid = getState().auth.uid;
+			var tvShowRef = firebaseRef.child(`users/${uid}/tvShows`).push(showObj);
+			var showDataRef = firebaseRef.child(`users/${uid}/showData`).push(showDataInit);
 			Promise.all([tvShowRef, showDataRef]).then((values) => {
 				dispatch(addShowById({
 						tvShow: {
@@ -79,13 +100,6 @@ export function showSelected(showId) {
 		type: SHOW_SELECTED,
 		payload: showId
 	}
-}
-
-export function setSearchText(searchText) {
-	return {
-		type: SET_SEARCH_TEXT,
-		action: searchText
-	};
 }
 
 //set "addingNewShow" state either true and false
@@ -130,7 +144,8 @@ export var startOnDownloadChange = (type, value, showSelected, firebaseKey) => {
 		} else {
 			updType = {seasonDownloading: value};
 		}
-		var showUpdateRef = firebaseRef.child(`showData/${firebaseKey}`).update(updType);
+		var uid = getState().auth.uid;
+		var showUpdateRef = firebaseRef.child(`users/${uid}/showData/${firebaseKey}`).update(updType);
 
 		return showUpdateRef.then(() => {
 			dispatch(onDownloadChange(type, value, showSelected));
@@ -160,8 +175,8 @@ export var startOnWatchingChange = (type, value, showSelected, firebaseKey) => {
 		} else {
 			updType = {seasonWatching: value};
 		}
-		console.log('watching:', updType);
-		var showUpdateRef = firebaseRef.child(`showData/${firebaseKey}`).update(updType);
+		var uid = getState().auth.uid;
+		var showUpdateRef = firebaseRef.child(`users/${uid}/showData/${firebaseKey}`).update(updType);
 
 		return showUpdateRef.then(() => {
 			dispatch(onWatchingChange(type, value, showSelected));
@@ -181,8 +196,10 @@ export var deleteShow = (showId) => {
 
 export var startDeleteShow = (showId, tvShowFirebaseKey, showDataFirebaseKey) => {
 		return (dispatch, getState) => {
-			var tvShowRef = firebaseRef.child(`tvShows/${tvShowFirebaseKey}`).remove();
-			var showDataRef = firebaseRef.child(`showData/${showDataFirebaseKey}`).remove();
+			var uid = getState().auth.uid;
+
+			var tvShowRef = firebaseRef.child(`users/${uid}/tvShows/${tvShowFirebaseKey}`).remove();
+			var showDataRef = firebaseRef.child(`users/${uid}/showData/${showDataFirebaseKey}`).remove();
 
 			return Promise.all([tvShowRef, showDataRef]).then(() => {
 				dispatch(deleteShow(showId));
@@ -214,7 +231,9 @@ export var startAddUserLink = (showData, link, linkDesc) => {
 
 	//Setup thunk to call action after adding to firebase.
 	return (dispatch, getState) => {
-		var addLinkRef = firebaseRef.child(`showData/${firebaseKey}`).update({showLinks:newLinkArray});
+		var uid = getState().auth.uid;
+
+		var addLinkRef = firebaseRef.child(`users/${uid}/showData/${firebaseKey}`).update({showLinks:newLinkArray});
 		addLinkRef.then(()=> {
 			//dispatch(addUserLinks(showId, link, linkDesc));
 			dispatch(addUserLinks(showId, newLinkArray));
@@ -238,10 +257,13 @@ export var onLinkDelete = (showSelected, Index) => {
 export var startOnLinkDelete = (showSelected, Index, showData) => {
 	//showData will be the showData for the show we need to update
 	const { showId, firebaseKey, showLinks } = showData;
+	//only return the links we are NOT deleting
 	var newLinksArray = showLinks.filter((obj, idx) => Index !== idx);
 
 	return (dispatch, getState) => {
-		var updLinksRef = firebaseRef.child(`showData/${firebaseKey}`).update({showLinks:newLinksArray});
+		var uid = getState().auth.uid;
+
+		var updLinksRef = firebaseRef.child(`users/${uid}/showData/${firebaseKey}`).update({showLinks:newLinksArray});
 
 		updLinksRef.then(() => {
 			dispatch(addUserLinks(showId, newLinksArray));
@@ -263,13 +285,16 @@ export var setDataLoading = (dataLoadingFlag) => {
 export var addShowNotes = (showSelected, showNotes) => {
 	return {
 		type: ADD_SHOW_NOTES,
+		showSelected: showSelected,
 		payload: showNotes
 	};
 };
 
 export var startAddShowNotes = (showNotes, showSelected, firebaseKey) => {
 	return (dispatch, getState) => {
-		var updNotesRef = firebaseRef.child(`showData/${firebaseKey}`).update({showNotes:showNotes});
+		var uid = getState().auth.uid;
+
+		var updNotesRef = firebaseRef.child(`users/${uid}/showData/${firebaseKey}`).update({showNotes:showNotes});
 
 		updNotesRef.then(() => {
 			dispatch(addShowNotes(showSelected, showNotes));
@@ -277,3 +302,161 @@ export var startAddShowNotes = (showNotes, showSelected, firebaseKey) => {
 	};
 };
 //------- END - ADD SHOW NOTES GROUP ------------
+
+//----- GROUPS Actions --------------------------------
+export var addGroup = (newGroup, firebaseKey) => {
+	newGroup.firebaseKey = firebaseKey;
+	console.log(newGroup);
+	return {
+		type: ADD_GROUP,
+		newGroup
+	};
+};
+
+export var startAddGroup = (groupName) => {
+	const newGroup = {
+		name: groupName,
+		members: []
+	};
+	return (dispatch, getState) => {
+		//get the uid of the currently logged in user
+		let uid = getState().auth.uid;
+
+		var groupRef = firebaseRef.child(`users/${uid}/groups`).push(newGroup);
+		let firebaseKey = groupRef.key;
+		groupRef.then(() => {
+			dispatch(addGroup(newGroup, firebaseKey));
+		});
+	};
+};
+//---------- UPDATE GROUP --------------
+export var updateGroup = (newName, newDesc, firebaseKey) => {
+	return {
+		type: UPDATE_GROUP,
+		newName,
+		newDesc,
+		firebaseKey
+	};
+};
+
+export var startUpdateGroup = (newName, newDesc, firebaseKey) => {
+	return (dispatch, getState) => {
+		//get the uid of the currently logged in user
+		let uid = getState().auth.uid;
+
+		let groupRef = firebaseRef.child(`users/${uid}/groups/${firebaseKey}`);
+		groupRef.update({name: newName, description: newDesc}).then(() => {
+			console.log('Update Done');
+			dispatch(updateGroup(newName, newDesc, firebaseKey));
+		});
+	};
+};
+//---------- DELETE GROUP --------------
+export var deleteGroup = (firebaseKey) => {
+	return {
+		type: DELETE_GROUP,
+		firebaseKey
+	};
+};
+export var startDeleteGroup = (firebaseKey) => {
+	return (dispatch, getState) => {
+		//get the uid of the currently logged in user
+		let uid = getState().auth.uid;
+
+		var groupRef = firebaseRef.child(`users/${uid}/groups/${firebaseKey}`).remove();
+		groupRef.then(() => {
+			dispatch(deleteGroup(firebaseKey));
+		});
+	};
+};
+
+
+
+//----- AUTH Actions --------------------------------
+export var startLogin = (loginType, email='', password='') => {
+	return (dispatch, getState) => {
+		//set auth:status to working
+		dispatch(authStatus(AUTH_WORKING));
+		//now start the process of logging in
+		var provider;
+		switch (loginType) {
+			case 'GOOGLE':
+				provider = googleProvider;
+				break;
+			case 'GITHUB':
+				provider = githubProvider;
+				break;
+			case 'EMAIL':
+				return firebase.auth().signInWithEmailAndPassword(email, password).then((res) => {
+				  dispatch(authStatus(AUTH_SUCCESSFUL));
+				}).catch((error) => {
+					var errorCode = error.code;
+		  		var errorMessage = error.message;
+					dispatch(authStatus(AUTH_ERROR, `Email Sign In Error - Error Code: ${errorCode} - Error Message: ${errorMessage}`));
+				});
+				break;
+			default:
+				console.log('Error in startLogin-default case executed');
+				return null;
+		}
+
+		return firebase.auth().signInWithPopup(provider).then((result) => {
+					console.log('Auth Success', result);
+					dispatch(authStatus(AUTH_SUCCESSFUL));
+				}, (error) => {
+					var errorCode = error.code;
+		  		var errorMessage = error.message;
+					dispatch(authStatus(AUTH_ERROR, `${loginType} Error - Error Code: ${errorCode} - Error Message: ${errorMessage}`));
+				});
+
+	};
+};
+
+export var startEmailRegistration = (email='', password='') => {
+	//Thunk
+	return (dispatch, getState) => {
+		//set auth:status to working
+		dispatch(authStatus(AUTH_WORKING));
+		firebase.auth().createUserWithEmailAndPassword(email, password).then((result) => {
+					console.log('Auth Success', result);
+					dispatch(authStatus(AUTH_SUCCESSFUL));
+				}).catch(function(error) {
+		  // Handle Errors here.
+		  var errorCode = error.code;
+		  var errorMessage = error.message;
+		  console.log("Email registration error", errorCode, errorMessage);
+		  dispatch(authStatus(AUTH_ERROR, `Email registration error - Error Code: ${errorCode} - Error Message: ${errorMessage}`));
+		});
+	};
+};
+
+export var startLogout = () => {
+	return (dispatch, getState) => {
+		return firebase.auth().signOut().then(() => {
+			dispatch(authStatus(AUTH_NULL));
+			console.log('logged out');
+		});
+	};
+};
+
+//Actions for auth Login and logout -- stored in auth: section of store
+export var authLogin = (uid) => {
+	return {
+		type: LOGIN,
+		uid
+	};
+};
+
+export var authLogout = () => {
+	return {
+		type: LOGOUT
+	};
+};
+
+//Actions for Auth status
+export var authStatus = (status, errorMessage=undefined) => {
+	return {
+		type: status,
+		errorMessage
+	}
+};

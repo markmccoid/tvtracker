@@ -58,9 +58,9 @@ module.exports = {
 				var image = showDataTemp.image || {medium: './images/placeholder.png'};
 				var showImage = image.medium;
 
-				//create an link to the imdb page
+				//create an link to the imdb page and download page
 				var imdbLink = `http://www.imdb.com/title/${showDataTemp.externals.imdb}`;
-				console.log('imdblinke', imdbLink);
+				var downloadLink = `https://thepiratebay.org/search/${showDataTemp.name}`;
 				//Build showData object.  Pull off pieces from resonse that we want
 				var showData = {
 					id: showDataTemp.id,
@@ -73,7 +73,8 @@ module.exports = {
 					dayAired: showDataTemp.dayAired === undefined ? null : showDataTemp.dayAired,
 					image: showImage,
 					seasons: showDataTemp.seasons === undefined ? null : showDataTemp.seasons,
-					imdbLink: imdbLink
+					imdbLink: imdbLink,
+					downloadLink: downloadLink
 				};
 
 				//Get array of unique seasons
@@ -119,53 +120,53 @@ module.exports = {
 			}));
 	},
 
-	loadInitialData: function () {
-		var stringtvShows = localStorage.getItem('tvShows');
-		var tvShows = [];
+	// loadInitialData: function () {
+	// 	var stringtvShows = localStorage.getItem('tvShows');
+	// 	var tvShows = [];
 
-		try {
-			if ( tvShows === null ) {
-				return [];
-			} else {
-				tvShows = JSON.parse(stringtvShows);
-			}
-		} catch (e) {
-			alert("error loading TVShows from localStorage: ", e);
-		}
-		return Array.isArray(tvShows) ? tvShows : [];
-	},
+	// 	try {
+	// 		if ( tvShows === null ) {
+	// 			return [];
+	// 		} else {
+	// 			tvShows = JSON.parse(stringtvShows);
+	// 		}
+	// 	} catch (e) {
+	// 		alert("error loading TVShows from localStorage: ", e);
+	// 	}
+	// 	return Array.isArray(tvShows) ? tvShows : [];
+	// },
 
-	loadInitialData: function () {
-		var stringShowData = localStorage.getItem('showData');
+	loadInitialData: function (uid) {
 		var showData = [];
 
 		var showDataArray = [];
 		var tvShowsArray = [];
-		return firebaseRef.once('value').then((snap) => {
+		var groupsArray = [];
+
+		return firebaseRef.child(`users/${uid}`).once('value').then((snap) => {
 			//make sure we have some data if not, return empty arrays
-			if (!snap.val()) { return {tvShows: tvShowsArray, showData: showDataArray};}
+			if (!snap.val()) {
+				return {
+								tvShows: tvShowsArray,
+								showData: showDataArray,
+								groups: groupsArray
+							};
+			}
 			var snapData = snap.val().showData;
 			var tvData = snap.val().tvShows;
+			var groupsData = snap.val().groups;
+
 			showDataArray = Object.keys(snapData).map((objKey) => {
 				return {...snapData[objKey], firebaseKey: objKey};
 			});
 			tvShowsArray = Object.keys(tvData).map((objKey) => {
 				return {...tvData[objKey], firebaseKey: objKey};
 			});
-			return {tvShows: tvShowsArray, showData: showDataArray};
+			groupsArray = Object.keys(groupsData).map((objKey) => {
+				return {...groupsData[objKey], firebaseKey: objKey};
+			});
+			return {tvShows: tvShowsArray, showData: showDataArray, groups: groupsArray};
 		});
-
-		// try {
-		// 	if ( stringShowData === null ) {
-		// 		return [];
-		// 	} else {
-		// 		showData = JSON.parse(stringShowData);
-		// 	}
-		// } catch (e) {
-		// 	alert ("error loading showData from localStorage: ", e);
-		// }
-		// console.log(showData);
-		// return Array.isArray(showData) ? showData : [];
-	},
-}
+	}
+};
 

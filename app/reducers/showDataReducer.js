@@ -1,11 +1,11 @@
-import { ADD_SHOW_BY_ID, ON_DELETE_SHOW, ON_DL_FORM_CHANGE, ON_WATCHING_FORM_CHANGE, ADD_USER_LINK, DELETE_USER_LINK, INITIALIZE_STORE, ADD_SHOW_NOTES } from '../actions/actions';
-
+//import { ADD_SHOW_BY_ID, ON_DELETE_SHOW, ON_DL_FORM_CHANGE, ON_WATCHING_FORM_CHANGE, ADD_USER_LINK, DELETE_USER_LINK, INITIALIZE_STORE, ADD_SHOW_NOTES } from '../actions/actions';
+import * as C from '../actions/actions';
 export var showDataReducer = (state = [], action) => {
 
 	switch (action.type) {
-		case INITIALIZE_STORE:
+		case C.INITIALIZE_STORE:
 			return action.payload.showData;
-		case ADD_SHOW_BY_ID:
+		case C.ADD_SHOW_BY_ID:
 			//Expecting to get back action.payload with showdata and season detail
 			// var newShowDataRecord =
 			// 			{
@@ -18,11 +18,11 @@ export var showDataReducer = (state = [], action) => {
 			// 			} ;
 			return [...state, action.payload.showData];
 
-		case ON_DELETE_SHOW:
+		case C.ON_DELETE_SHOW:
 			var showId = action.payload;
 			return state.filter((showData) => showData.showId !== showId);
 
-		case ON_DL_FORM_CHANGE:
+		case C.ON_DL_FORM_CHANGE:
 			var { type, value, showSelected } = action.action;
 			var idx = state.findIndex((showData) => {return showData.showId === showSelected});
 			//create new item for changed object in array -- NOTE: slice returns an array.
@@ -46,7 +46,7 @@ export var showDataReducer = (state = [], action) => {
 				...state.slice(idx+1)
 			];
 
-		case ON_WATCHING_FORM_CHANGE:
+		case C.ON_WATCHING_FORM_CHANGE:
 			var { type, value, showSelected } = action.action;
 			var idx = state.findIndex((showData) => {return showData.showId === showSelected});
 			//create new item for changed object in array -- NOTE: slice returns an array.
@@ -70,7 +70,7 @@ export var showDataReducer = (state = [], action) => {
 				...state.slice(idx+1)
 			];
 
-		case ADD_USER_LINK:
+		case C.ADD_USER_LINK:
 			var { showSelected, newLinksArray } = action.action;
 			// var { showSelected, link, linkDesc } = action.action;
 
@@ -87,7 +87,7 @@ export var showDataReducer = (state = [], action) => {
 				...state.slice(idx+1)
 				];
 
-		case DELETE_USER_LINK:
+		case C.DELETE_USER_LINK:
 			var { showSelected, index } = action.action;
 
 			//Find show being edited's index
@@ -96,18 +96,34 @@ export var showDataReducer = (state = [], action) => {
 			var showToUpdate = state.slice(idx, idx+1)[0];
 			//
 			var updatedShowData;
-			//If there are any show links add to them else create a new one.
-				var linksToUpdate = [...showToUpdate.showLinks];
-				linksToUpdate.splice(index, 1);
-				updatedShowData = {...showToUpdate, showLinks: [...linksToUpdate]};
+			//Create new array with current links
+			var linksToUpdate = [...showToUpdate.showLinks];
+			//Splice (i.e. delete) the link on the index passed in
+			linksToUpdate.splice(index, 1);
+			//replace this new set of links (array) in our updated show object
+			updatedShowData = {...showToUpdate, showLinks: [...linksToUpdate]};
 
 			return [
 				...state.slice(0,idx),
 				updatedShowData,
 				...state.slice(idx+1)
 				];
-		case ADD_SHOW_NOTES:
-			return state;
+		case C.ADD_SHOW_NOTES:
+			var { showSelected, payload } = action;
+			//Find show being edited's index
+			var idx = state.findIndex((showData) => {return showData.showId === showSelected});
+			//Get the show data to update ... will be an object
+			var showToUpdate = state.slice(idx, idx+1)[0];
+			//
+			var updatedShowData = {...showToUpdate, showNotes: payload};
+
+			return [
+				...state.slice(0,idx),
+				updatedShowData,
+				...state.slice(idx+1)
+				];
+		case C.LOGOUT:
+			return [];
 		default:
 			return state;
 	}

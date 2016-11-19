@@ -7,9 +7,13 @@ import { tvShowsReducer } from '../reducers/tvShowsReducer';
 import { showSelectedReducer} from '../reducers/showSelectedReducer';
 import { showDataReducer } from '../reducers/showDataReducer';
 import { dataLoadingReducer } from '../reducers/dataLoadingReducer';
+import { groupsReducer } from '../reducers/groupsReducer';
+import { authReducer } from '../reducers/authReducer';
+import { AUTH_NULL } from '../actions/actions';
 
 import helpers from '../helpers/helpers';
 import tvMaze from '../api/tvmaze';
+
 
 //--Take out in production -- Using for testing to make sure not mutating state in reducers
 import freeze from 'redux-freeze';
@@ -22,6 +26,12 @@ const INITIAL_STATE = {
 			newShowsInfo: {
 				showsReturned: [],
 				addingNewShow: false
+			},
+			groups: [],
+			auth: {
+				uid: undefined,
+				status: AUTH_NULL,
+				errorMessage: undefined
 			}
 		};
 //--------------------------------------------
@@ -34,7 +44,9 @@ export var configure = (initialState = INITIAL_STATE) => {
 			showData: showDataReducer,
 			showSelectedId: showSelectedReducer,
 			dataLoading: dataLoadingReducer,
-			newShowsInfo: newShowsInfoReducer
+			newShowsInfo: newShowsInfoReducer,
+			groups: groupsReducer,
+			auth: authReducer
 	});
 
 	var store = createStore(reducer, initialState, compose(applyMiddleware(promise, thunk, freeze),

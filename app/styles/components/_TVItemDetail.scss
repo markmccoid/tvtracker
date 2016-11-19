@@ -1,4 +1,14 @@
 .detail-title {
 	margin-bottom: -.1rem;
 	font-weight: bold;
+	border-bottom:1px solid $border;
+}
+.summary {
+	max-height:300px;
+	overflow: auto;
+	margin: .5rem 0;
+}
+.summary-container {
+	padding: .5rem;
+	border:1px solid $border;
 }

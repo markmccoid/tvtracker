@@ -17,6 +17,7 @@ class MainDisplay extends React.Component {
 	}
 
 	render() {
+
 		//determine if we should show the TVItemDetail or the AddTVShow
 		var detailPane = () => {
 //			console.log(this.props.tvShows, this.props.showSelectedId);
@@ -28,15 +29,15 @@ class MainDisplay extends React.Component {
 				var showData = this.props.showData.filter((showData) => showData.showId === this.props.showSelectedId)[0];
 				//console.log('TVItemDetail', tvShow);
 				var dl = !tvShow ? '' : tvShow.downloading;
-				return <TVItemDetail tvShow={tvShow} showData={showData} showSelectedId={this.props.showSelectedId}/>
+				return <TVItemDetail tvShow={tvShow} showData={showData} showSelectedId={this.props.showSelectedId} />
 			}
 		}
 		return (
 			<div className="row">
 				<div className="columns small-4" style={{paddingRight: "0"}}>
-					<TVList tvShows={ this.props.tvShows } />
+					<TVList tvShows={ this.props.tvShows } showSelected={this.props.showSelectedId} showData={this.props.showData}/>
 				</div>
-				<div className="columns callout secondary">
+				<div className="columns callout secondary" style={{marginLeft: "-1px", marginRight: "14px", marginBottom:"0px"}}>
 					{detailPane()}
 				</div>
 			</div>

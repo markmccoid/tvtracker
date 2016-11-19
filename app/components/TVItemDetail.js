@@ -1,9 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { startDeleteShow } from '../actions/actions';
+import Griddle from 'griddle-react';
+require('semantic-ui-css/semantic');
+import { Accordion, Icon } from 'semantic-ui-react';
+
 var alertify = require('alertifyjs');
 
 import helpers from '../helpers/helpers';
+import TVShowHelpers from '../helpers/TVShowHelpers';
 import TVUserData from 'TVUserData';
 
 const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, showData }) => {
@@ -22,30 +27,53 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, showData }) => 
               		});
 	};
 
-		//Loop through selected show and find episode airing after or on today
-		const currentDateValue = helpers.getCurrentDateObject().valueOf();
-		var episodesAfterToday = tvShow.seasonData[tvShow.seasonData.length-1].episodeDetail.filter((episode) => {
-			let epDateValue = new Date(episode.episodeAirDate).valueOf();
-			return epDateValue >= currentDateValue;
+	// //--GET NEXT EPISODE
+		var nextEpisodeObj = TVShowHelpers.getNextEpisode(tvShow);
+		var nextEpisodeBlock = <div className="columns small-4 callout small secondary">
+						<p className="detail-title">{nextEpisodeObj.title}</p>
+						<p>{nextEpisodeObj.date} | {nextEpisodeObj.number}</p>
+					</div>;
+
+	//-----------------------------------------
+	//--Setup Griddle Component to Show Episode
+		var griddleColumnMetadata = [
+			{"columnName": "episodeNumber",
+		    "order": 1,
+		    "locked": false,
+		    "visible": true,
+		    "displayName": "Episode #"
+		  },
+		  {"columnName": "episodeName",
+		    "order": 2,
+		    "locked": false,
+		    "visible": true,
+		    "displayName": "Name"
+		  },
+		  {"columnName": "episodeAirDate",
+		    "order": 3,
+		    "locked": false,
+		    "visible": true,
+		    "displayName": "Air Date"
+		  }];
+		var sortedSeasons = [...tvShow.seasonData];
+		sortedSeasons.sort((a,b) => b.season-a.season);
+		var griddleComponents = sortedSeasons.map((season) => {
+			let aTitle = <Accordion.Title>
+          						<Icon name='dropdown' />
+          						<strong>Season {season.season}</strong>
+        						</Accordion.Title>;
+			let aContent =	<Accordion.Content>
+												<Griddle  results={season.episodeDetail}
+												columnMetadata= {griddleColumnMetadata}
+												showSettings={true}
+												resultsPerPage={10}
+												enableInfiniteScroll={true} useFixedHeader={true} bodyHeight={300}
+												/>
+									 		</Accordion.Content>;
+					return ([aTitle,aContent]);
 		});
 
-		var nextEpisodeObj;
-		if ( episodesAfterToday.length === 0 ) {  //if this array (build above) returns 0, then there are no episodes after today.  return a blank object
-			nextEpisodeObj = {date: '', number: ''};
-		} else {
-			//grab the first episode in the array (the next one to show) Display in render below
-			nextEpisodeObj = {date: episodesAfterToday[0].episodeAirDate, number: episodesAfterToday[0].episodeNumber};
-			// var episodeDate = new Date(tvShow.seasonData[tvShow.seasonData.length-1].episodeDetail[4].episodeAirDate).valueOf();
-			// console.log('TVItemDetail: ', tvShow.name, tvShow.seasonData[tvShow.seasonData.length-1].episodeDetail[4].episodeAirDate);
-			// console.log(helpers.getCurrentDateObject().valueOf(), helpers.getCurrentDateString(), episodeDate);
-			//-------------------------
-		}
-
-
-				var nextEpisodeBlock = <div className="columns small-4 callout small secondary">
-								<p className="detail-title">Next Episode</p>
-								<p>{nextEpisodeObj.date} | {nextEpisodeObj.number}</p>
-							</div>;
+	//--------------------------------------
 		return (
 			<div>
 				<span>Show Selected: {showSelectedId}</span>
@@ -73,16 +101,18 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, showData }) => 
 							{nextEpisodeObj.date === '' ? '' : nextEpisodeBlock}
 						</div>
 						<div className="row">
-							<div className="columns small-12">
+							<div className="columns small-12 summary-container">
 								<p className="detail-title">Summary</p>
-								<div dangerouslySetInnerHTML={{__html: tvShow.summary}}></div>
+								<div dangerouslySetInnerHTML={{__html: tvShow.summary}} className="summary"></div>
 							</div>
 						</div>
 					</div>
 				</div>
 
 				<TVUserData showData={showData} />
-
+				<Accordion>
+					{griddleComponents}
+				</Accordion>
 			</div>
 		);
 	};

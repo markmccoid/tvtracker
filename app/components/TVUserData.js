@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { startOnDownloadChange, startOnWatchingChange, startAddUserLink, startOnLinkDelete, startAddShowNotes } from '../actions/actions';
+import { startOnDownloadChange, startOnWatchingChange, startAddUserLink, startOnLinkDelete, startAddShowNotes, addShowNotes } from '../actions/actions';
 import Link from 'Link';
 
 class TVUserData extends React.Component {
@@ -10,8 +10,7 @@ class TVUserData extends React.Component {
 
 		this.state = {
 			showAddLink: false,
-			addLinkIcon: './images/TriangleRightBlue.png',
-			tempShowNotes: this.props.showData.showNotes
+			addLinkIcon: './images/TriangleRightBlue.png'
 		}
 	}
 
@@ -21,9 +20,9 @@ class TVUserData extends React.Component {
 	}
 
 	render() {
-	var { showData, startOnDownloadChange, startOnWatchingChange, startOnLinkDelete, startAddShowNotes } = this.props;
-// console.log(this.props.showData.showLinks);
-// console.log(this.props);
+	var { showData, startOnDownloadChange, startOnWatchingChange, startOnLinkDelete, startAddShowNotes, addShowNotes } = this.props;
+	console.log(showData);
+
 	var addLinkForm =
 				<form onSubmit={(e)=> {
 						e.preventDefault();
@@ -68,7 +67,7 @@ class TVUserData extends React.Component {
 		<div className="callout" style={{paddingTop:0, paddingBottom: 0}}>
 			<div className="row">
 				<div className="column small-6">
-					<h4 className="text-center">Downloading</h4>
+					<h4 className="text-center">Last Downloaded</h4>
 				</div>
 				<div className="column small-6" style={{borderLeft:"1px solid #ccc"}}>
 					<h4 className="text-center">Watching</h4>
@@ -138,12 +137,12 @@ class TVUserData extends React.Component {
 
 			<label> <h5>Show Notes</h5>
 				<textarea rows="2" cols="50"
-					onChange={(e) => this.setState({tempShowNotes: e.target.value})}
-					onBlur={() => startAddShowNotes(this.state.tempShowNotes, showData.showId, showData.firebaseKey)}
-					value={this.state.tempShowNotes}
+					onChange={(e) => addShowNotes(showData.showId, e.target.value)}
+					onBlur={(e) => startAddShowNotes(e.target.value, showData.showId, showData.firebaseKey)}
+					value={showData.showNotes}
 					/>
 			</label>
-			<button className="button small" onClick={() => startAddShowNotes(this.state.tempShowNotes, showData.showId, showData.firebaseKey)}>Save Note</button>
+			<button className="button small" onClick={() => startAddShowNotes(showData.showNotes, showData.showId, showData.firebaseKey)}>Save Note</button>
 		</div>
 	);
 }
@@ -154,6 +153,7 @@ export default connect(null, {
 	startOnWatchingChange,
 	startAddUserLink,
 	startOnLinkDelete,
-	startAddShowNotes
+	startAddShowNotes,
+	addShowNotes
 })(TVUserData);
 

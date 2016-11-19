@@ -28,7 +28,8 @@ class TVList extends React.Component {
 		// }, function (e){
 		// 	console.log(e);
 		// });
-		var { tvShows } = this.props;
+		var { tvShows, showData } = this.props;
+
 		var tvShowsSorted = [...tvShows].sort(this.showSort);
 		var loadingOrEmptyJSX;
 		var getTVListItems;
@@ -43,8 +44,9 @@ class TVList extends React.Component {
 			//<div>No Shows</div>
 		} else {
 			getTVListItems = tvShowsSorted.map((tvShow) => {
+				let currShowData = showData.filter((obj) => tvShow.id === obj.showId)[0];
 				return (
-					<TVListItem showName={tvShow.name} showId={tvShow.id} onSelectShow={this.props.showSelected} key={tvShow.id}/>
+					<TVListItem tvShow={tvShow} showData={currShowData} showSelectedId={this.props.showSeletedId} onSelectShow={this.props.showSelected} key={tvShow.id}/>
 				);
 			});
 		}
@@ -74,7 +76,8 @@ class TVList extends React.Component {
 
 function mapStateToProps(state) {
 	return {
-		dataLoading: state.dataLoading
+		dataLoading: state.dataLoading,
+		showSeletedId: state.showSelectedId
 	}
 }
 
