@@ -26,6 +26,8 @@ export const ADD_SHOW_NOTES = 'ADD_SHOW_NOTES';
 export const ADD_GROUP = 'ADD_GROUP';
 export const DELETE_GROUP = 'DELETE_GROUP';
 export const UPDATE_GROUP = 'UPDATE_GROUP';
+export const ADD_GROUP_MEMBER = 'ADD_GROUP_MEMBER';
+export const DELETE_GROUP_MEMBER = 'DELETE_GROUP_MEMBER';
 
 //Auth Actions
 export const LOGIN = 'LOGIN';
@@ -306,16 +308,16 @@ export var startAddShowNotes = (showNotes, showSelected, firebaseKey) => {
 //----- GROUPS Actions --------------------------------
 export var addGroup = (newGroup, firebaseKey) => {
 	newGroup.firebaseKey = firebaseKey;
-	console.log(newGroup);
 	return {
 		type: ADD_GROUP,
 		newGroup
 	};
 };
 
-export var startAddGroup = (groupName) => {
+export var startAddGroup = (groupName, groupDescription) => {
 	const newGroup = {
 		name: groupName,
+		description: groupDescription,
 		members: []
 	};
 	return (dispatch, getState) => {
@@ -369,8 +371,48 @@ export var startDeleteGroup = (firebaseKey) => {
 		});
 	};
 };
+//---------- ADD NEW MEMBER TO GROUP --------------
+export var addGroupMember = (newMemberObj, groupFirebaseKey) => {
+	return {
+		type: ADD_GROUP_MEMBER,
+		newMemberObj,
+		groupFirebaseKey
+	};
+};
 
+export var startAddGroupMember = (newMemberObj, groupFirebaseKey) => {
+	return (dispatch, getState) => {
+		//get the uid of the currently logged in user
+		let uid = getState().auth.uid;
 
+		var groupMemberRef = firebaseRef.child(`users/${uid}/groups/${groupFirebaseKey}/members`).push(newMemberObj);
+		groupMemberRef.then(() => {
+			dispatch(addGroupMember(newMemberObj, groupFirebaseKey));
+		});
+	};
+};
+//---------- DELETE MEMBER TO GROUP --------------
+export var deleteGroupMember = (memberFirebaseKey, groupFirebaseKey) => {
+	return {
+		type: DELETE_GROUP_MEMBER,
+		memberFirebaseKey,
+		groupFirebaseKey
+	};
+};
+
+export var startDeleteGroupMember = (memberFirebaseKey, groupFirebaseKey) => {
+	return (dispatch, getState) => {
+		//get the uid of the currently logged in user
+		let uid = getState().auth.uid;
+
+		var groupMemberRef = firebaseRef.child(`users/${uid}/groups/${groupFirebaseKey}/members/${memberFirebaseKey}`).remove();
+		groupMemberRef.then(() => {
+			console.log('newMember deleted');
+			dispatch(deleteGroupMember(memberFirebaseKey, groupFirebaseKey));
+		});
+	};
+};
+//=============================================================
 
 //----- AUTH Actions --------------------------------
 export var startLogin = (loginType, email='', password='') => {

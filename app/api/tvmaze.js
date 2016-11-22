@@ -163,7 +163,15 @@ module.exports = {
 				return {...tvData[objKey], firebaseKey: objKey};
 			});
 			groupsArray = Object.keys(groupsData).map((objKey) => {
-				return {...groupsData[objKey], firebaseKey: objKey};
+				let members = groupsData[objKey].members || [];
+				let memberArray =[];
+
+				if (!members.length) {
+					memberArray = Object.keys(members).map((objKey) => {
+						return {...members[objKey], firebaseKey: objKey};
+					});
+				}
+				return {...groupsData[objKey], members: [...memberArray], firebaseKey: objKey};
 			});
 			return {tvShows: tvShowsArray, showData: showDataArray, groups: groupsArray};
 		});

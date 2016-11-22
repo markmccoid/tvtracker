@@ -12,3 +12,8 @@
 	padding: .5rem;
 	border:1px solid $border;
 }
+.show-image {
+	-webkit-box-shadow: 4px 6px 20px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 4px 6px 20px 0px rgba(0,0,0,0.75);
+	box-shadow: 4px 6px 20px 0px rgba(0,0,0,0.75);
+}

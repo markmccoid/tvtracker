@@ -76,12 +76,11 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, showData }) => 
 	//--------------------------------------
 		return (
 			<div>
-				<span>Show Selected: {showSelectedId}</span>
 				<div className="row">
 					<div className="shrink columns medium-4">
 						<div className="row">
 							<div className="columns medium-12">
-								<img src={tvShow.image} />
+								<img src={tvShow.image} className="show-image"/>
 							</div>
 							<div className="columns medium-12">
 								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.firebaseKey, showData.firebaseKey, tvShow.name)} className="button alert">Delete</a>
