@@ -35,7 +35,7 @@ class MainDisplay extends React.Component {
 		return (
 			<div className="row">
 				<div className="columns small-4" style={{paddingRight: "0"}}>
-					<TVList tvShows={ this.props.tvShows } showSelected={this.props.showSelectedId} showData={this.props.showData}/>
+					<TVList tvShows={this.props.tvShows} showData={this.props.showData} groups={this.props.groups}/>
 				</div>
 				<div className="columns callout secondary" style={{marginLeft: "-1px", marginRight: "14px", marginBottom:"0px"}}>
 					{detailPane()}
@@ -50,7 +50,8 @@ function mapStateToProps(state) {
 		tvShows: state.tvShows,
 		showData: state.showData,
 		showSelectedId: state.showSelectedId,
-		newShowsInfo: state.newShowsInfo
+		newShowsInfo: state.newShowsInfo,
+		groups: state.groups
 	};
 }
 export default connect(mapStateToProps)(MainDisplay);

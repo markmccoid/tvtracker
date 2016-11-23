@@ -1,5 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
+require('semantic-ui-css/semantic');
+import { Accordion, Icon } from 'semantic-ui-react';
 
 import TVListItem from 'TVListItem';
 import tvMaze from './../api/tvMaze';
@@ -29,6 +31,15 @@ class TVList extends React.Component {
 		// 	console.log(e);
 		// });
 		var { tvShows, showData } = this.props;
+		//Since we are modifying groups, need a new array of groups to work with.
+		var groups = [...this.props.groups];
+		groups.push({
+			name: "All",
+			description: "Default list of all shows",
+			firebaseKey: '',
+			members: tvShows.map((show) => ({tvShowFirebaseKey: show.firebaseKey, tvShowName: show.name, tvShowId: show.id}))
+		});
+
 
 		var tvShowsSorted = [...tvShows].sort(this.showSort);
 		var loadingOrEmptyJSX;
@@ -43,14 +54,44 @@ class TVList extends React.Component {
 			getTVListItems =	loadingOrEmptyJSX;
 			//<div>No Shows</div>
 		} else {
-			getTVListItems = tvShowsSorted.map((tvShow) => {
-				let currShowData = showData.filter((obj) => tvShow.id === obj.showId)[0];
-				return (
-					<TVListItem tvShow={tvShow} showData={currShowData} showSelectedId={this.props.showSeletedId} onSelectShow={this.props.showSelected} key={tvShow.id}/>
-				);
-			});
+			//If there are groups, then render with groups/
+			//Need to have a default "All" group that always exists in the group array
+			//Could create programatically here or put in store..  Programatically probably easier/better
+			if (groups.length > 0){
+				getTVListItems = groups.map((group) => {
+					let groupHeader = <Accordion.Title>
+				          						<Icon name='dropdown' />
+				          						<strong>{group.name}</strong>
+				        						</Accordion.Title>;
+					let showList = group.members.map((memberShow) => {
+						//Get the showData for the current memberShow
+						let currShowData = showData.filter((obj) => memberShow.tvShowId === obj.showId)[0];
+						let currentTVShow = tvShows.filter((show) => memberShow.tvShowId === show.id)[0];
+						return (
+								<TVListItem tvShow={currentTVShow}
+														showData={currShowData}
+														showSelectedId={this.props.showSeletedId}
+														onSelectShow={this.props.showSelected}
+														key={memberShow.tvShowId} />
+						);
+					});
+					let wrappedList = <Accordion.Content>
+														<ul className="menu vertical">
+														{showList}
+														</ul>
+														</Accordion.Content>;
+					return [groupHeader, wrappedList];
+				});
+			} else {
+				getTVListItems = tvShowsSorted.map((tvShow) => {
+							let currShowData = showData.filter((obj) => tvShow.id === obj.showId)[0];
+							return (
+								<TVListItem tvShow={tvShow} showData={currShowData} showSelectedId={this.props.showSeletedId} onSelectShow={this.props.showSelected} key={tvShow.id}/>
+							);
+						});
+			}
 		}
-
+console.log("tvList", groups);
 		return (
 			<div className="callout secondary" style={{height:"100%"}}>
 				<div>
@@ -66,9 +107,11 @@ class TVList extends React.Component {
 	        </div>
 				</div>
 				<hr />
-				<ul className="menu vertical">
+				<Accordion>
+
 						{getTVListItems}
-				</ul>
+
+				</Accordion>
 			</div>
 		);
 	}
