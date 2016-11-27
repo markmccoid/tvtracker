@@ -2,7 +2,7 @@ import React from 'react';
 import { Accordion, Icon } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 
-import { startAddGroup, startDeleteGroup, startUpdateGroup } from  '../actions/actions';
+import { startAddGroup, startDeleteGroup, startUpdateGroup, startUpdateGroupSort } from  '../actions/actions';
 import GroupList from 'GroupList';
 import GroupEdit from 'GroupEdit';
 import GroupAdd from 'GroupAdd';
@@ -37,10 +37,70 @@ class GroupMain extends React.Component {
 		}
 	}
 
+	changeSort = (direction, startSortNum) => {
+		let groupsCopy = [...this.props.groups];
+
+		console.log("startSortNum", startSortNum);
+
+		let resortedGroups = [];
+		groupsCopy.forEach((group) => {
+			if (direction === 'up') {
+				//If startSortNum equal 1, then we move it to bottom and all others up 1
+				if (startSortNum === 1) {
+					if (group.sort === 1) {
+						resortedGroups.push({fbKey: group.firebaseKey, newSort: this.props.groups.length})
+					} else {
+						resortedGroups.push({fbKey: group.firebaseKey, newSort: group.sort - 1});
+					}
+				} else {
+					//startSortNum not equal to one, so we are just swapping positions of two adjacent groups
+					//look for the group before the one being pushed up
+					if (group.sort === (startSortNum-1)) {
+						resortedGroups.push({fbKey: group.firebaseKey, newSort: startSortNum});
+					} else if(group.sort === startSortNum) {
+						resortedGroups.push({fbKey: group.firebaseKey, newSort: startSortNum-1});
+					}
+				}
+			} else {
+				//Going down
+				if (startSortNum === this.props.groups.length) {
+					if (group.sort === this.props.groups.length) {
+						resortedGroups.push({fbKey: group.firebaseKey, newSort: 1})
+					} else {
+						resortedGroups.push({fbKey: group.firebaseKey, newSort: group.sort + 1});
+					}
+				} else {
+					if (group.sort === (startSortNum+1)) {
+						resortedGroups.push({fbKey: group.firebaseKey, newSort: startSortNum});
+					} else if(group.sort === startSortNum) {
+						resortedGroups.push({fbKey: group.firebaseKey, newSort: startSortNum+1});
+					}
+				}
+			}
+		});
+
+		resortedGroups.forEach((group) => {
+			this.props.dispatch(startUpdateGroupSort(group.fbKey, group.newSort));
+		});
+		console.log(resortedGroups);
+		// let otherSortNum;
+
+		// if (direction === 'up') {
+		// 	otherSortNum = startSortNum === 1 ? startSortNum + 1 : startSortNum - 1;
+		// } else {
+		// 	otherSortNum = startSortNum === this.props.groups.length ? 1 : startSortNum + 1;
+		// }
+		// //direction === 'up' ? startSortNum - 1 : startSortNum + 1;
+		// let startGroup = {...this.props.groups.filter((group) => startSortNum === group.sort)[0]};
+		// let otherGroup = {...this.props.groups.filter((group) => otherSortNum === group.sort)[0]};
+
+		// startGroup.sort = otherSortNum;
+		// otherGroup.sort = startSortNum;
+
+	}
+
 	checkGroupExists = (newName, newDescription) => {
-		console.log(newName);
 		let foundGroup = this.props.groups.filter((group) => group.name === newName);
-		console.log(foundGroup);
 
 		if (foundGroup.length > 0) {
 			alert (`Group with name ${newName} already exists`);
@@ -89,7 +149,7 @@ class GroupMain extends React.Component {
 						</button>
 						<br />
 						<h3>Group Edit</h3>
-						<GroupList groups={this.props.groups} setGroupEditingState={this.setGroupEditingState}/>
+						<GroupList groups={this.props.groups} setGroupEditingState={this.setGroupEditingState} changeSort={this.changeSort}/>
 					</div>
 				</div>
 				<div className="columns callout secondary" style={{marginLeft: "-1px", marginRight: "14px"}}>

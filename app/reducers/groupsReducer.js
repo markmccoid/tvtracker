@@ -30,6 +30,21 @@ export var groupsReducer = (state = [], action) => {
 			let filterGroups = [...state];
 			return filterGroups.filter((obj) => action.firebaseKey !== obj.firebaseKey);
 
+		case C.UPDATE_GROUP_SORT:
+			let updGroupSort = [...state];
+
+			let finalGroupSort = updGroupSort.map((obj) => {
+				if (action.firebaseKey === obj.firebaseKey) {
+					return {
+						...obj,
+						sort: action.sort
+					};
+				} else {
+					return obj
+				}
+			});
+			return finalGroupSort;
+
 		case C.ADD_GROUP_MEMBER:
 			let addGroup = state.filter((obj) => obj.firebaseKey === action.groupFirebaseKey)[0];
 			let groupidx = state.findIndex((obj) => {return obj.firebaseKey === action.groupFirebaseKey});

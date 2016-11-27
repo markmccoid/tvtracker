@@ -77,7 +77,7 @@ class TVUserData extends React.Component {
 				<div className="columns medium-3">
 					<p className="detail-title">Season DL</p>
 					<input
-						type="text"
+						type="number"
 						value={showData.seasonDownloading}
 						onChange={(event) => startOnDownloadChange('s', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
@@ -85,7 +85,7 @@ class TVUserData extends React.Component {
 				<div className="columns medium-3">
 					<p className="detail-title">Episode DL</p>
 					<input
-						type="text"
+						type="number"
 						value={showData.episodeDownloading}
 						onChange={(event) => startOnDownloadChange('e', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
@@ -94,7 +94,7 @@ class TVUserData extends React.Component {
 				<div className="columns medium-3" style={{borderLeft:"1px solid #ccc"}}>
 					<p className="detail-title">Season Watching</p>
 					<input
-						type="text"
+						type="number"
 						value={showData.seasonWatching}
 						onChange={(event) => startOnWatchingChange('s', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
@@ -102,7 +102,7 @@ class TVUserData extends React.Component {
 				<div className="columns medium-3">
 					<p className="detail-title">Episode Watching</p>
 					<input
-						type="text"
+						type="number"
 						value={showData.episodeWatching}
 						onChange={(event) => startOnWatchingChange('e', event.target.value, showData.showId, showData.firebaseKey)}
 						/>

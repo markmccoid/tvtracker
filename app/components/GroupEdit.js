@@ -76,10 +76,10 @@ class GroupEdit extends React.Component {
 			<h3>Edit Shows in {groupInfo.name}</h3>
 			<div className="row">
 				<div className="columns small-6">
-					<ul>
+					<ul className="menu vertical">
 						{availableShows.map((show) => {
 							return (
-									<li
+									<li className="hover-pointer"
 										key={show.id}
 										onClick={() => this.moveToMembers(show)}>
 										{show.name}
@@ -90,10 +90,10 @@ class GroupEdit extends React.Component {
 				</div>
 
 				<div className="columns small-6">
-					<ul>
+					<ul className="menu vertical">
 						{groupMembers.map((member) => {
 								return (
-									<li
+									<li className="hover-pointer"
 										key={member.tvShowFirebaseKey}
 										onClick={() => this.deleteFromMembers(member.firebaseKey)}>
 								 		{member.tvShowName}

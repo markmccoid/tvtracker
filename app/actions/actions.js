@@ -28,6 +28,7 @@ export const DELETE_GROUP = 'DELETE_GROUP';
 export const UPDATE_GROUP = 'UPDATE_GROUP';
 export const ADD_GROUP_MEMBER = 'ADD_GROUP_MEMBER';
 export const DELETE_GROUP_MEMBER = 'DELETE_GROUP_MEMBER';
+export const UPDATE_GROUP_SORT = 'UPDATE_GROUP_SORT';
 
 //Auth Actions
 export const LOGIN = 'LOGIN';
@@ -350,6 +351,27 @@ export var startUpdateGroup = (newName, newDesc, firebaseKey) => {
 		groupRef.update({name: newName, description: newDesc}).then(() => {
 			console.log('Update Done');
 			dispatch(updateGroup(newName, newDesc, firebaseKey));
+		});
+	};
+};
+//---------- UPDATE GROUP SORT --------------
+export var updateGroupSort = (firebaseKey, newSort) => {
+	return {
+		type: UPDATE_GROUP_SORT,
+		sort: newSort,
+		firebaseKey
+	};
+};
+
+export var startUpdateGroupSort = (firebaseKey, newSort) => {
+	return (dispatch, getState) => {
+		//get the uid of the currently logged in user
+		let uid = getState().auth.uid;
+
+		let groupRef = firebaseRef.child(`users/${uid}/groups/${firebaseKey}`);
+		groupRef.update({sort: newSort}).then(() => {
+			console.log('Update Done');
+			dispatch(updateGroupSort(firebaseKey, newSort));
 		});
 	};
 };

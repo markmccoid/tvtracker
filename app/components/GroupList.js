@@ -6,11 +6,24 @@ class GroupList extends React.Component {
 		super(props);
 	}
 	render() {
+		//Sort function by sort number
+		let sortBySortNumber = (a, b) => {
+			if (a.sort > b.sort) {
+			    return 1;
+			}
+			if (a.sort < b.sort) {
+			    return -1;
+			}
+			  // a must be equal to b
+			  return 0;
+		};
 		//Loop through groups and create an <li> for each one.
-		let groupList = this.props.groups.map((group) => {
+		let sortedGroup = [...this.props.groups];
+		sortedGroup.sort(sortBySortNumber);
+		let groupList = sortedGroup.map((group) => {
 				return (
 					<li key={group.firebaseKey}>
-						<GroupListItem groupInfo={group} setGroupEditingState={this.props.setGroupEditingState}/>
+						<GroupListItem groupInfo={group} setGroupEditingState={this.props.setGroupEditingState} changeSort={this.props.changeSort}/>
 					</li>
 				);
 			});
