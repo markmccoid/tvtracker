@@ -315,11 +315,12 @@ export var addGroup = (newGroup, firebaseKey) => {
 	};
 };
 
-export var startAddGroup = (groupName, groupDescription) => {
+export var startAddGroup = (groupName, groupDescription, sort) => {
 	const newGroup = {
 		name: groupName,
 		description: groupDescription,
-		members: []
+		members: [],
+		sort
 	};
 	return (dispatch, getState) => {
 		//get the uid of the currently logged in user

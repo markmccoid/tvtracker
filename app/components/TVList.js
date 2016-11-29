@@ -6,6 +6,7 @@ import { Accordion, Icon } from 'semantic-ui-react';
 import TVListItem from 'TVListItem';
 import tvMaze from './../api/tvMaze';
 import { loadNewShows, showSelected, addingNewShow, setNewShowFlag } from '../actions/actions';
+import helpers from '../helpers/helpers';
 
 class TVList extends React.Component {
 	constructor(props) {
@@ -58,7 +59,9 @@ class TVList extends React.Component {
 			//Need to have a default "All" group that always exists in the group array
 			//Could create programatically here or put in store..  Programatically probably easier/better
 			if (groups.length > 0){
-				getTVListItems = groups.map((group) => {
+				let groupsSorted = [...groups];
+				groupsSorted.sort(helpers.groupSortBySortNumber);
+				getTVListItems = groupsSorted.map((group) => {
 					let groupHeader = <Accordion.Title>
 				          						<Icon name='dropdown' />
 				          						<strong>{group.name}</strong>

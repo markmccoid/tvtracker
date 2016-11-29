@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test karma start",
-    "build": "webpack",
+    "build": "webpack -p",
+		"postinstall": "webpack -p",
     "start": "npm run build && node server.js"
   },
   "author": "",
@@ -44,17 +45,17 @@
     "semantic-ui-css": "^2.2.4",
     "semantic-ui-react": "^0.60.4",
     "style-loader": "^0.13.0",
+    "file-loader": "^0.9.0",
+    "url-loader": "^0.5.7",
     "webpack": "^1.12.13"
   },
   "devDependencies": {
-    "file-loader": "^0.9.0",
     "karma": "^0.13.22",
     "karma-chrome-launcher": "^0.2.2",
     "karma-mocha": "^0.2.2",
     "karma-mocha-reporter": "^2.0.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^1.7.0",
-    "mocha": "^2.4.5",
-    "url-loader": "^0.5.7"
+    "mocha": "^2.4.5"
   }
 }

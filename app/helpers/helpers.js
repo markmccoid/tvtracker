@@ -40,5 +40,17 @@ export default  {
 	exportData: (data) => {
 		var jsonData = JSON.stringify(data);
 		console.log(jsonData);
-	}
+	},
+	//
+	//Sort function by sort number
+	groupSortBySortNumber: (a, b) => {
+			if (a.sort > b.sort) {
+			    return 1;
+			}
+			if (a.sort < b.sort) {
+			    return -1;
+			}
+			  // a must be equal to b
+			  return 0;
+		}
 }

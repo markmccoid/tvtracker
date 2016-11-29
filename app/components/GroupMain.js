@@ -40,8 +40,6 @@ class GroupMain extends React.Component {
 	changeSort = (direction, startSortNum) => {
 		let groupsCopy = [...this.props.groups];
 
-		console.log("startSortNum", startSortNum);
-
 		let resortedGroups = [];
 		groupsCopy.forEach((group) => {
 			if (direction === 'up') {
@@ -79,24 +77,11 @@ class GroupMain extends React.Component {
 			}
 		});
 
+		//Loop through the groups that need to be updated for the new sort order
+		//and dispatch the update sort action for each one
 		resortedGroups.forEach((group) => {
 			this.props.dispatch(startUpdateGroupSort(group.fbKey, group.newSort));
 		});
-		console.log(resortedGroups);
-		// let otherSortNum;
-
-		// if (direction === 'up') {
-		// 	otherSortNum = startSortNum === 1 ? startSortNum + 1 : startSortNum - 1;
-		// } else {
-		// 	otherSortNum = startSortNum === this.props.groups.length ? 1 : startSortNum + 1;
-		// }
-		// //direction === 'up' ? startSortNum - 1 : startSortNum + 1;
-		// let startGroup = {...this.props.groups.filter((group) => startSortNum === group.sort)[0]};
-		// let otherGroup = {...this.props.groups.filter((group) => otherSortNum === group.sort)[0]};
-
-		// startGroup.sort = otherSortNum;
-		// otherGroup.sort = startSortNum;
-
 	}
 
 	checkGroupExists = (newName, newDescription) => {
@@ -105,7 +90,7 @@ class GroupMain extends React.Component {
 		if (foundGroup.length > 0) {
 			alert (`Group with name ${newName} already exists`);
 		} else {
-			this.props.dispatch(startAddGroup(newName, newDescription));
+			this.props.dispatch(startAddGroup(newName, newDescription, this.props.groups.length+1));
 		}
 	}
 
@@ -125,12 +110,13 @@ class GroupMain extends React.Component {
 		switch (this.state.page)
 		{
 			case 'ADD':
-				mainPanelJSX = <GroupAdd checkGroupExists={this.checkGroupExists}/>;
+				mainPanelJSX = <GroupAdd checkGroupExists={this.checkGroupExists} />;
 				break;
 			case 'EDIT':
 				let selectedGroupInfo = this.props.groups.filter((group) => group.firebaseKey === this.state.groupEditing)[0];
 				mainPanelJSX = <GroupEdit tvShows={this.props.tvShows}
 													groupInfo={selectedGroupInfo}
+													groups={this.props.groups}
 													setGroupEditingState={this.setGroupEditingState}
 													showBlankGroup={this.showBlankGroup}/>;
 				break;

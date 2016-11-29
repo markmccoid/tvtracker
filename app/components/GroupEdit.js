@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { startAddGroupMember, startDeleteGroupMember, startDeleteGroup, startUpdateGroup } from '../actions/actions';
+import { startAddGroupMember, startDeleteGroupMember, startDeleteGroup, startUpdateGroup, startUpdateGroupSort } from '../actions/actions';
 
 
 class GroupEdit extends React.Component {
@@ -39,6 +39,23 @@ class GroupEdit extends React.Component {
 		this.props.dispatch(startUpdateGroup(newName, newDesc, groupInfo.firebaseKey));
 	}
 
+	updateSortAfterDelete = (sortNumDeleted) => {
+		//Need to find the groups with sorts > the sortNumDeleted and move them down 1 sort num
+		let resortedGroups = [];
+
+		this.props.groups.forEach((group) => {
+			if (group.sort > sortNumDeleted) {
+				resortedGroups.push({fbKey: group.firebaseKey, newSort: group.sort - 1});
+			}
+		});
+		//Loop through the groups that need to be updated for the new sort order
+		//and dispatch the update sort action for each one
+		resortedGroups.forEach((group) => {
+			this.props.dispatch(startUpdateGroupSort(group.fbKey, group.newSort));
+		});
+	}
+
+
 	render() {
 		console.log("groupEDIT-groupinfo",this.props.groupInfo);
 		let { groupInfo } = this.props;
@@ -59,7 +76,9 @@ class GroupEdit extends React.Component {
 								onClick={() => {
 									this.props.setGroupEditingState(undefined);
 									this.props.showBlankGroup();
-									this.props.dispatch(startDeleteGroup(groupInfo.firebaseKey))
+									this.props.dispatch(startDeleteGroup(groupInfo.firebaseKey));
+									//Need to update all the sort numbers after the delete
+									this.updateSortAfterDelete(groupInfo.sort);
 								}}>Delete</button>
 				<button className="button small" type="button" onClick={() => this.props.showBlankGroup()}>Cancel</button>
 			</form>;
@@ -76,6 +95,7 @@ class GroupEdit extends React.Component {
 			<h3>Edit Shows in {groupInfo.name}</h3>
 			<div className="row">
 				<div className="columns small-6">
+				<h4>Available Shows</h4>
 					<ul className="menu vertical">
 						{availableShows.map((show) => {
 							return (
@@ -90,6 +110,7 @@ class GroupEdit extends React.Component {
 				</div>
 
 				<div className="columns small-6">
+				<h4>Selected Shows</h4>
 					<ul className="menu vertical">
 						{groupMembers.map((member) => {
 								return (

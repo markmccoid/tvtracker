@@ -1,5 +1,6 @@
 import React from 'react';
 import GroupListItem from 'GroupListItem';
+import helpers from '../helpers/helpers';
 
 class GroupList extends React.Component {
 	constructor(props) {
@@ -19,7 +20,7 @@ class GroupList extends React.Component {
 		};
 		//Loop through groups and create an <li> for each one.
 		let sortedGroup = [...this.props.groups];
-		sortedGroup.sort(sortBySortNumber);
+		sortedGroup.sort(helpers.groupSortBySortNumber);
 		let groupList = sortedGroup.map((group) => {
 				return (
 					<li key={group.firebaseKey}>
