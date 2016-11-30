@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+var alertify = require('alertifyjs');
+
 import { startAddGroupMember, startDeleteGroupMember, startDeleteGroup, startUpdateGroup, startUpdateGroupSort } from '../actions/actions';
 
 
@@ -79,6 +81,7 @@ class GroupEdit extends React.Component {
 									this.props.dispatch(startDeleteGroup(groupInfo.firebaseKey));
 									//Need to update all the sort numbers after the delete
 									this.updateSortAfterDelete(groupInfo.sort);
+									alertify.alert(`Group "${groupInfo.name}" Deleted`);
 								}}>Delete</button>
 				<button className="button small" type="button" onClick={() => this.props.showBlankGroup()}>Cancel</button>
 			</form>;

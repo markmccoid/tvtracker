@@ -1,26 +1,15 @@
 import React from 'react';
 import GroupListItem from 'GroupListItem';
-import helpers from '../helpers/helpers';
+import _ from 'lodash';
 
 class GroupList extends React.Component {
 	constructor(props) {
 		super(props);
 	}
 	render() {
-		//Sort function by sort number
-		let sortBySortNumber = (a, b) => {
-			if (a.sort > b.sort) {
-			    return 1;
-			}
-			if (a.sort < b.sort) {
-			    return -1;
-			}
-			  // a must be equal to b
-			  return 0;
-		};
 		//Loop through groups and create an <li> for each one.
-		let sortedGroup = [...this.props.groups];
-		sortedGroup.sort(helpers.groupSortBySortNumber);
+		let sortedGroup = _.sortBy([...this.props.groups], 'sort');
+
 		let groupList = sortedGroup.map((group) => {
 				return (
 					<li key={group.firebaseKey}>

@@ -42,15 +42,16 @@ export default  {
 		console.log(jsonData);
 	},
 	//
-	//Sort function by sort number
-	groupSortBySortNumber: (a, b) => {
-			if (a.sort > b.sort) {
-			    return 1;
-			}
-			if (a.sort < b.sort) {
-			    return -1;
-			}
-			  // a must be equal to b
-			  return 0;
-		}
+	//sort allowing you to pass in the property in object that you want to sort by.
+	//Usage: someArray.sort((a,b) => objectSort(a,b,'sortField'))
+	objectSort: (a, b, sortField = "name") => {
+	  if (a[sortField] > b[sortField]) {
+	    return 1;
+	  }
+	  if (a[sortField] < b[sortField]) {
+	    return -1;
+	  }
+	  // a must be equal to b
+	  return 0;
+	}
 }

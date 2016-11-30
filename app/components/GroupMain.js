@@ -1,8 +1,11 @@
 import React from 'react';
 import { Accordion, Icon } from 'semantic-ui-react';
 import { connect } from 'react-redux';
+import { hashHistory } from 'react-router';
 
-import { startAddGroup, startDeleteGroup, startUpdateGroup, startUpdateGroupSort } from  '../actions/actions';
+var alertify = require('alertifyjs');
+
+import { startAddGroup, startDeleteGroup, startUpdateGroup, startUpdateGroupSort, AUTH_LOGGED_IN } from  '../actions/actions';
 import GroupList from 'GroupList';
 import GroupEdit from 'GroupEdit';
 import GroupAdd from 'GroupAdd';
@@ -85,15 +88,22 @@ class GroupMain extends React.Component {
 	}
 
 	checkGroupExists = (newName, newDescription) => {
-		let foundGroup = this.props.groups.filter((group) => group.name === newName);
+		let foundGroup = this.props.groups.filter((group) => group.name.toLowerCase() === newName.toLowerCase());
 
 		if (foundGroup.length > 0) {
-			alert (`Group with name ${newName} already exists`);
+			alertify
+				.alert('tvTracker Alert',`Group with name ${newName} already exists`, function(){
+    			alertify.message('OK');
+  			});
 		} else {
 			this.props.dispatch(startAddGroup(newName, newDescription, this.props.groups.length+1));
+			alertify.success(`Group "${newName}" Added`);
 		}
 	}
 
+	componentWillMount() {
+		this.props.authStatus === AUTH_LOGGED_IN ? null : hashHistory.push('/');
+	}
 	render() {
 		var groups, mainPanelJSX;
 		if (this.props.groups.length > 0) {
@@ -149,7 +159,8 @@ class GroupMain extends React.Component {
 function mapState (state) {
 	return {
 		groups: state.groups,
-		tvShows: state.tvShows
+		tvShows: state.tvShows,
+		authStatus: state.auth.status
 	}
 }
 export default connect(mapState)(GroupMain);
