@@ -9,7 +9,7 @@ import { showDataReducer } from '../reducers/showDataReducer';
 import { dataLoadingReducer } from '../reducers/dataLoadingReducer';
 import { groupsReducer } from '../reducers/groupsReducer';
 import { authReducer } from '../reducers/authReducer';
-import { AUTH_NULL } from '../actions/actions';
+import { AUTH_LOGGED_OUT } from '../actions/actions';
 
 import helpers from '../helpers/helpers';
 import tvMaze from '../api/tvmaze';
@@ -30,7 +30,7 @@ const INITIAL_STATE = {
 			groups: [],
 			auth: {
 				uid: undefined,
-				status: AUTH_NULL,
+				status: AUTH_LOGGED_OUT,
 				errorMessage: undefined
 			}
 		};

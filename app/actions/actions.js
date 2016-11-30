@@ -34,9 +34,9 @@ export const UPDATE_GROUP_SORT = 'UPDATE_GROUP_SORT';
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
 export const AUTH_WORKING = 'AUTH_WORKING';
-export const AUTH_SUCCESSFUL = 'AUTH_SUCCESSFUL';
+export const AUTH_LOGGED_IN = 'AUTH_LOGGED_IN';
 export const AUTH_ERROR = 'AUTH_ERROR';
-export const AUTH_NULL = 'AUTH_NULL';
+export const AUTH_LOGGED_OUT = 'AUTH_LOGGED_OUT';
 
 export function initializeStore(data) {
 	return {
@@ -453,7 +453,7 @@ export var startLogin = (loginType, email='', password='') => {
 				break;
 			case 'EMAIL':
 				return firebase.auth().signInWithEmailAndPassword(email, password).then((res) => {
-				  dispatch(authStatus(AUTH_SUCCESSFUL));
+				  dispatch(authStatus(AUTH_LOGGED_IN));
 				}).catch((error) => {
 					var errorCode = error.code;
 		  		var errorMessage = error.message;
@@ -467,7 +467,7 @@ export var startLogin = (loginType, email='', password='') => {
 
 		return firebase.auth().signInWithPopup(provider).then((result) => {
 					console.log('Auth Success', result);
-					dispatch(authStatus(AUTH_SUCCESSFUL));
+					dispatch(authStatus(AUTH_LOGGED_IN));
 				}, (error) => {
 					var errorCode = error.code;
 		  		var errorMessage = error.message;
@@ -484,7 +484,7 @@ export var startEmailRegistration = (email='', password='') => {
 		dispatch(authStatus(AUTH_WORKING));
 		firebase.auth().createUserWithEmailAndPassword(email, password).then((result) => {
 					console.log('Auth Success', result);
-					dispatch(authStatus(AUTH_SUCCESSFUL));
+					dispatch(authStatus(AUTH_LOGGED_IN));
 				}).catch(function(error) {
 		  // Handle Errors here.
 		  var errorCode = error.code;
@@ -498,7 +498,7 @@ export var startEmailRegistration = (email='', password='') => {
 export var startLogout = () => {
 	return (dispatch, getState) => {
 		return firebase.auth().signOut().then(() => {
-			dispatch(authStatus(AUTH_NULL));
+			dispatch(authStatus(AUTH_LOGGED_OUT));
 			console.log('logged out');
 		});
 	};
