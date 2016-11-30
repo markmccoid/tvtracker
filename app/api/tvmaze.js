@@ -152,9 +152,10 @@ module.exports = {
 								groups: groupsArray
 							};
 			}
-			var snapData = snap.val().showData;
-			var tvData = snap.val().tvShows;
-			var groupsData = snap.val().groups;
+
+			var snapData = snap.val().showData || {};
+			var tvData = snap.val().tvShows || {};
+			var groupsData = snap.val().groups || {};
 
 			showDataArray = Object.keys(snapData).map((objKey) => {
 				return {...snapData[objKey], firebaseKey: objKey};
@@ -173,6 +174,7 @@ module.exports = {
 				}
 				return {...groupsData[objKey], members: [...memberArray], firebaseKey: objKey};
 			});
+			console.log(groupsArray);
 			return {tvShows: tvShowsArray, showData: showDataArray, groups: groupsArray};
 		});
 	}
