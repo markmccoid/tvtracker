@@ -10,7 +10,7 @@ var Navbar = ({dispatch, tvShows}) => {
 	return (
 		<div className="row">
 		<div className="columns ">
-			<div className="top-bar" data-topbar role="navigation">
+			<div className="top-bar" data-topbar role="navigation" style={{border: "1px solid hsla(0,0%,4%,.25)"}}>
 				<div className="top-bar-left">
 					<span className="title">TV Tracker</span>
 					<ul className="menu">

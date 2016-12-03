@@ -102,6 +102,7 @@ class GroupMain extends React.Component {
 	}
 
 	componentWillMount() {
+		//This will make sure that only users who are logged in will be able to access this component.
 		this.props.authStatus === AUTH_LOGGED_IN ? null : hashHistory.push('/');
 	}
 	render() {

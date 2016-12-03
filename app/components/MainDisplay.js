@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import _ from 'lodash';
 
 //Import Components
 import TVList from 'TVList';
@@ -17,7 +18,6 @@ class MainDisplay extends React.Component {
 	}
 
 	render() {
-
 		//determine if we should show the TVItemDetail or the AddTVShow
 		var detailPane = () => {
 //			console.log(this.props.tvShows, this.props.showSelectedId);
@@ -27,17 +27,29 @@ class MainDisplay extends React.Component {
 			} else {
 				var tvShow = this.props.tvShows.filter((show) => show.id === this.props.showSelectedId)[0];
 				var showData = this.props.showData.filter((showData) => showData.showId === this.props.showSelectedId)[0];
-				//console.log('TVItemDetail', tvShow);
-				var dl = !tvShow ? '' : tvShow.downloading;
-				return <TVItemDetail tvShow={tvShow} showData={showData} showSelectedId={this.props.showSelectedId} />
+
+				//Find shows that are in the selected group and set up if we delete show.
+				//may be better to do it TVItemDetail
+				let groupsWithShow = _.map(this.props.groups,(group) => {
+					let membersToDelete = _.filter(group.members,(member) => member.tvShowId === this.props.showSelectedId);
+					if (membersToDelete.length > 0) {
+					return {
+								memberFirebaseKey: membersToDelete[0].firebaseKey,
+								groupFirebaseKey: group.firebaseKey
+							}
+					}
+				});
+				groupsWithShow = groupsWithShow.filter((obj) => obj);
+				console.log('groupsWithShow', groupsWithShow);
+				return <TVItemDetail tvShow={tvShow} showData={showData} showSelectedId={this.props.showSelectedId} groupsWithShow={groupsWithShow}/>
 			}
 		}
 		return (
 			<div className="row">
-				<div className="columns small-4" style={{paddingRight: "0"}}>
+				<div className="columns small-4" style={{paddingRight: "0", marginLeft:"15px", marginBottom:"0px"}}>
 					<TVList tvShows={this.props.tvShows} showData={this.props.showData} groups={this.props.groups}/>
 				</div>
-				<div className="columns callout secondary" style={{marginLeft: "-1px", marginRight: "14px", marginBottom:"0px"}}>
+				<div className="columns callout secondary" style={{marginLeft: "-1px", marginRight: "15px", marginBottom:"0px"}}>
 					{detailPane()}
 				</div>
 			</div>

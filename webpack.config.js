@@ -56,6 +56,12 @@ module.exports = {
       // the file-loader emits files.
       {
       	test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader"
+      },
+      {
+      	test: /\.less$/, loader: "style-loader!css-loader!less-loader"
+      },
+      {
+      	test: /\.gif$/, loader: "url-loader?mimetype=image/png"
       }
 		]
 	},

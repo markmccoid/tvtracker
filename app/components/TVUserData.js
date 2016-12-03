@@ -21,7 +21,8 @@ class TVUserData extends React.Component {
 
 	render() {
 	var { showData, startOnDownloadChange, startOnWatchingChange, startOnLinkDelete, startAddShowNotes, addShowNotes } = this.props;
-	console.log(showData);
+	//console.log(showData);
+
 
 	var addLinkForm =
 				<form onSubmit={(e)=> {

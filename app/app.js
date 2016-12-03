@@ -9,6 +9,9 @@ import { initializeStore, setDataLoading, authLogin, authLogout } from './action
 import routes from './routes';
 import firebase from 'app/firebase';
 
+import localizer from 'react-widgets/lib/localizers/simple-number'
+localizer();
+
 //setup an observer -- whenever firebase auth state changes
 //run the function.  Right now, if not logged in, go to login
 //else go to main page.
@@ -42,6 +45,7 @@ var store = require('./store/configureStore').configure();
 
 //-------------------------------------------------------
 
+//require('react-widgets/lib/less/react-widgets.less');
 //Load foundation
 require('style!css!foundation-sites/dist/foundation.min.css');
 $(document).foundation();

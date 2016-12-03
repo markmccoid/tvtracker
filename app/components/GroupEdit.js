@@ -23,9 +23,8 @@ class GroupEdit extends React.Component {
 		this.props.dispatch(startAddGroupMember(newMemberObj, this.props.groupInfo.firebaseKey));
 	}
 
-	deleteFromMembers = (tvShowFirebaseKey) => {
-		console.log("deleting", tvShowFirebaseKey);
-		this.props.dispatch(startDeleteGroupMember(tvShowFirebaseKey, this.props.groupInfo.firebaseKey));
+	deleteFromMembers = (memberFirebaseKey) => {
+		this.props.dispatch(startDeleteGroupMember(memberFirebaseKey, this.props.groupInfo.firebaseKey));
 	}
 
 	onGroupEdit= (e) => {

@@ -16,7 +16,6 @@ class TVList extends React.Component {
 	}
 
 	render() {
-
 		var { tvShows, showData } = this.props;
 		//Since we are modifying groups, need a new array of groups to work with.
 		var groups = [...this.props.groups];
@@ -58,6 +57,7 @@ class TVList extends React.Component {
 				  var sortedMembers = _.sortBy([...group.members], 'tvShowName');
 					// var sortedMembers = [...group.members];
 					// sortedMembers.sort((a,b) => helpers.objectSort(a,b, 'tvShowName'));
+
 					let showList = sortedMembers.map((memberShow) => {
 						//Get the showData for the current memberShow
 						let currShowData = showData.filter((obj) => memberShow.tvShowId === obj.showId)[0];
