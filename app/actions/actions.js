@@ -395,10 +395,10 @@ export var startDeleteGroup = (firebaseKey) => {
 	};
 };
 //---------- ADD NEW MEMBER TO GROUP --------------
-export var addGroupMember = (newMemberObj, groupFirebaseKey) => {
+export var addGroupMember = (newMemberObj, firebaseKey, groupFirebaseKey) => {
 	return {
 		type: ADD_GROUP_MEMBER,
-		newMemberObj,
+		newMemberObj: {...newMemberObj, firebaseKey: firebaseKey},
 		groupFirebaseKey
 	};
 };
@@ -410,7 +410,7 @@ export var startAddGroupMember = (newMemberObj, groupFirebaseKey) => {
 
 		var groupMemberRef = firebaseRef.child(`users/${uid}/groups/${groupFirebaseKey}/members`).push(newMemberObj);
 		groupMemberRef.then(() => {
-			dispatch(addGroupMember(newMemberObj, groupFirebaseKey));
+			dispatch(addGroupMember(newMemberObj, groupMemberRef.key, groupFirebaseKey));
 		});
 	};
 };
@@ -429,8 +429,7 @@ export var startDeleteGroupMember = (memberFirebaseKey, groupFirebaseKey) => {
 		let uid = getState().auth.uid;
 
 		var groupMemberRef = firebaseRef.child(`users/${uid}/groups/${groupFirebaseKey}/members/${memberFirebaseKey}`).remove();
-		groupMemberRef.then(() => {
-			console.log('newMember deleted');
+		return groupMemberRef.then(() => {
 			dispatch(deleteGroupMember(memberFirebaseKey, groupFirebaseKey));
 		});
 	};

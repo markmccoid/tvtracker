@@ -174,7 +174,6 @@ module.exports = {
 				}
 				return {...groupsData[objKey], members: [...memberArray], firebaseKey: objKey};
 			});
-			console.log(groupsArray);
 			return {tvShows: tvShowsArray, showData: showDataArray, groups: groupsArray};
 		});
 	}

@@ -28,20 +28,7 @@ class MainDisplay extends React.Component {
 				var tvShow = this.props.tvShows.filter((show) => show.id === this.props.showSelectedId)[0];
 				var showData = this.props.showData.filter((showData) => showData.showId === this.props.showSelectedId)[0];
 
-				//Find shows that are in the selected group and set up if we delete show.
-				//may be better to do it TVItemDetail
-				let groupsWithShow = _.map(this.props.groups,(group) => {
-					let membersToDelete = _.filter(group.members,(member) => member.tvShowId === this.props.showSelectedId);
-					if (membersToDelete.length > 0) {
-					return {
-								memberFirebaseKey: membersToDelete[0].firebaseKey,
-								groupFirebaseKey: group.firebaseKey
-							}
-					}
-				});
-				groupsWithShow = groupsWithShow.filter((obj) => obj);
-				console.log('groupsWithShow', groupsWithShow);
-				return <TVItemDetail tvShow={tvShow} showData={showData} showSelectedId={this.props.showSelectedId} groupsWithShow={groupsWithShow}/>
+				return <TVItemDetail tvShow={tvShow} showData={showData} showSelectedId={this.props.showSelectedId} groups={this.props.groups}/>
 			}
 		}
 		return (

@@ -4,6 +4,7 @@ import { startDeleteShow, startDeleteGroupMember } from '../actions/actions';
 import Griddle from 'griddle-react';
 require('semantic-ui-css/semantic');
 import { Accordion, Icon } from 'semantic-ui-react';
+import _ from 'lodash';
 
 var alertify = require('alertifyjs');
 
@@ -11,20 +12,33 @@ import helpers from '../helpers/helpers';
 import TVShowHelpers from '../helpers/TVShowHelpers';
 import TVUserData from 'TVUserData';
 
-const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGroupMember, showData, groupsWithShow }) => {
-
+const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGroupMember, showData, groups }) => {
   if (!tvShow) {
   	return <div></div>
   }
 	var onDeleteShow = (showId, tvShowFirebaseKey, showDataFirebaseKey, showName) => {
-	alertify.confirm('', `Confirm Deletion of ${showName}`,
+		//Find shows that are in the selected group and set up if we delete show.
+		//may be better to do it TVItemDetail
+		let groupsWithShow = [];
+		_.forEach(groups,(group) => {
+			let membersToDelete = _.filter(group.members,(member) => member.tvShowId === showSelectedId);
+
+			if (membersToDelete.length > 0) {
+			groupsWithShow.push( {
+									memberFirebaseKey: membersToDelete[0].firebaseKey,
+									groupFirebaseKey: group.firebaseKey
+								});
+			}
+		});
+		//Get cofirmation of delete
+		alertify.confirm('', `Confirm Deletion of ${showName}`,
 									() => {
-										startDeleteShow(showId, tvShowFirebaseKey, showDataFirebaseKey);
 										//find if show is a member in any group and delete it from the group
 										groupsWithShow.forEach((show) => {
+											console.log('deleting member', show.memberFirebaseKey);
 											startDeleteGroupMember(show.memberFirebaseKey, show.groupFirebaseKey);
-										})
-
+										});
+										startDeleteShow(showId, tvShowFirebaseKey, showDataFirebaseKey);
 										//Alert that delete was successful
 										alertify.success(`Deleted ${showName}`);
 									},
