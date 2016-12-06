@@ -33,7 +33,7 @@ class MainDisplay extends React.Component {
 		}
 		return (
 			<div className="row">
-				<div className="columns small-4" style={{paddingRight: "0", marginLeft:"15px", marginBottom:"0px"}}>
+				<div className="columns small-4" style={{paddingRight: "0", marginBottom:"0px"}}>
 					<TVList tvShows={this.props.tvShows} showData={this.props.showData} groups={this.props.groups}/>
 				</div>
 				<div className="columns callout secondary" style={{marginLeft: "-1px", marginRight: "15px", marginBottom:"0px"}}>

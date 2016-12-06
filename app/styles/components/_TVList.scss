@@ -28,3 +28,16 @@ ul.menu.vertical {
 		border: 1px dashed $border;
 	}
 }
+.tv-list {
+	.ant-collapse-header {
+		font-size: 18px;
+		font-weight: bold;
+	}
+	.ant-collapse-content > .ant-collapse-content-box {
+		padding-top: 0 !important;
+		padding-bottom: 0 !important;
+	}
+	.ant-collapse-content {
+		padding: 0 0 !important;
+	}
+}

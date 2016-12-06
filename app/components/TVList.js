@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 require('semantic-ui-css/semantic');
 import { Accordion, Icon } from 'semantic-ui-react';
+import { Collapse } from 'antd';
+
 
 import _ from 'lodash';
 
@@ -17,6 +19,8 @@ class TVList extends React.Component {
 
 	render() {
 		var { tvShows, showData } = this.props;
+		//For antd accordion
+		const Panel = Collapse.Panel;
 		//Since we are modifying groups, need a new array of groups to work with.
 		var groups = [...this.props.groups];
 		groups.push({
@@ -50,10 +54,10 @@ class TVList extends React.Component {
 				// let groupsSorted = [...groups];
 				// groupsSorted.sort((a,b) => helpers.objectSort(a,b, 'sort'));
 				getTVListItems = groupsSorted.map((group) => {
-					let groupHeader = <Accordion.Title>
-				          						<Icon name='dropdown' />
-				          						<strong>{group.name}</strong>
-				        						</Accordion.Title>;
+					// let groupHeader = <Accordion.Title>
+				 //          						<Icon name='dropdown' />
+				 //          						<strong>{group.name}</strong>
+				 //        						</Accordion.Title>;
 				  var sortedMembers = _.sortBy([...group.members], 'tvShowName');
 					// var sortedMembers = [...group.members];
 					// sortedMembers.sort((a,b) => helpers.objectSort(a,b, 'tvShowName'));
@@ -70,12 +74,12 @@ class TVList extends React.Component {
 														key={memberShow.tvShowId} />
 						);
 					});
-					let wrappedList = <Accordion.Content>
+					let wrappedList = <Panel header={group.name}>
 														<ul className="menu vertical">
 														{showList}
 														</ul>
-														</Accordion.Content>;
-					return [groupHeader, wrappedList];
+														</Panel>;
+					return [wrappedList];
 				});
 			} else {
 				//If we have no groups, just render the sorted tv Show list
@@ -93,7 +97,7 @@ class TVList extends React.Component {
 		}
 
 		return (
-			<div className="callout secondary" style={{height:"100%"}}>
+			<div className="callout secondary tv-list" style={{height:"100%"}}>
 				<div>
 	        <div><button
 	        			onClick={(event) => {
@@ -107,9 +111,9 @@ class TVList extends React.Component {
 	        </div>
 				</div>
 				<hr />
-				<Accordion>
+				<Collapse accordion>
 					{getTVListItems}
-				</Accordion>
+				</Collapse>
 			</div>
 		);
 	}
