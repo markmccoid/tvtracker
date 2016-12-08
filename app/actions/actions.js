@@ -11,6 +11,9 @@ export const ADD_SHOW_BY_ID = 'ADD_SHOW_BY_ID';  //
 export const LOAD_NEWSHOWS = 'LOAD_NEWSHOWS';
 export const SET_ADD_NEW_SHOW = 'SET_ADD_NEW_SHOW';
 
+//Refresh Show Data
+export const REFRESH_SHOW_BY_ID = 'REFRESH_SHOW_BY_ID';
+
 //
 export const SHOW_SELECTED = 'SHOW_SELECTED';
 
@@ -97,6 +100,39 @@ export var startAddShowById= (showId) => {
 	};
 };
 //------- END - ADD SHOW BY ID GROUP ------------
+
+//-------REFRESH SHOW BY ID GROUP ------------
+export function refreshShowById(showObj) {
+//showData can either hold one show or an array of shows
+//	var request = tvMaze.getTVInfoAndEpisodes(showId);
+	return {
+		type: REFRESH_SHOW_BY_ID,
+		payload: showObj
+	};
+}
+
+//Called from AddTVItem.js and will ultimately call the addShowById action creator
+export var startRefreshShowById= (showId, tvShowFirebaseKey) => {
+
+	//Return thunk --
+	return (dispatch, getState) => {
+		var request = tvMaze.getTVInfoAndEpisodes(showId);
+		//once tvMaze data comes back "then"
+		return request.then((showObj) => {
+			//Get user id
+			var uid = getState().auth.uid;
+			//Update Firebase record
+			var tvShowRef = firebaseRef.child(`users/${uid}/tvShows/${tvShowFirebaseKey}`).update(showObj);
+			dispatch(refreshShowById({
+						tvShow: {
+							...showObj,
+							firebaseKey: tvShowFirebaseKey
+						}
+					}));
+			});
+	};
+};
+//------- END - REFRESH SHOW BY ID GROUP ------------
 
 export function showSelected(showId) {
 	return {

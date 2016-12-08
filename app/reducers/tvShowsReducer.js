@@ -9,6 +9,10 @@ export var tvShowsReducer = (state = [], action) => {
 			//Expecting to get back action.payload with showdata and season detail
 			return [...state, action.payload.tvShow];
 
+		case C.REFRESH_SHOW_BY_ID:
+			var newState = [...state.filter((tvShow) => tvShow.id !== action.payload.tvShow.id)];
+			return [...newState, {...action.payload.tvShow}];
+
 		case C.ON_DELETE_SHOW:
 			var showId = action.payload;
 			return state.filter((show) => show.id !== showId);

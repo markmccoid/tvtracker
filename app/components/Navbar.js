@@ -11,9 +11,10 @@ var Navbar = ({dispatch, tvShows}) => {
 		<div className="row">
 		<div className="columns ">
 			<div className="top-bar" data-topbar role="navigation" style={{border: "1px solid hsla(0,0%,4%,.25)"}}>
+			<img src="./images/placeholder.png" className="title float-left" width="100" height="100"></img>
 				<div className="top-bar-left">
-					<span className="title">TV Tracker</span>
-					<ul className="menu">
+
+					<ul className="menu" style={{fontSize: "20px"}}>
 					  <li><Link to="/main" >Home</Link></li>
 					  <li><Link to="groupmanage" >Group Management</Link></li>
 					  <li><a onClick={() => dispatch(startLogout())}>Logout</a></li>

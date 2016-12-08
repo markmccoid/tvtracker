@@ -1,10 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { startDeleteShow, startDeleteGroupMember } from '../actions/actions';
+import { startDeleteShow, startDeleteGroupMember, startRefreshShowById } from '../actions/actions';
 import Griddle from 'griddle-react';
 require('semantic-ui-css/semantic');
 import { Accordion, Icon } from 'semantic-ui-react';
 import _ from 'lodash';
+import { Collapse } from 'antd';
+
+import { Table } from 'antd';
 
 var alertify = require('alertifyjs');
 
@@ -12,7 +15,7 @@ import helpers from '../helpers/helpers';
 import TVShowHelpers from '../helpers/TVShowHelpers';
 import TVUserData from 'TVUserData';
 
-const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGroupMember, showData, groups }) => {
+const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGroupMember, startRefreshShowById, showData, groups }) => {
   if (!tvShow) {
   	return <div></div>
   }
@@ -75,35 +78,59 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 		    "visible": true,
 		    "displayName": "Air Date"
 		  }];
+		var antdColumns = [{
+					title:'Episode #',
+					dataIndex: 'episodeNumber',
+					key: 'episodeNumber'
+				},{
+					title:'Name',
+					dataIndex: 'episodeName',
+					key: 'episodeName'
+				},{
+					title:'Air Date',
+					dataIndex: 'episodeAirDate',
+					key: 'episodeAirDate'
+				}];
 		var sortedSeasons = [...tvShow.seasonData];
 		sortedSeasons.sort((a,b) => b.season-a.season);
-		var griddleComponents = sortedSeasons.map((season) => {
-			let aTitle = <Accordion.Title>
-          						<Icon name='dropdown' />
-          						<strong>Season {season.season}</strong>
-        						</Accordion.Title>;
-			let aContent =	<Accordion.Content>
-												<Griddle  results={season.episodeDetail}
-												columnMetadata= {griddleColumnMetadata}
-												showSettings={true}
-												resultsPerPage={10}
-												enableInfiniteScroll={true} useFixedHeader={true} bodyHeight={300}
+
+		var episodeAccordion = sortedSeasons.map((season) => {
+		var antdData = season.episodeDetail.map((episode) => {
+					return (
+						{
+							key: episode.episodeNumber,
+							...episode
+						});
+				});
+			// let aTitle = <Accordion.Title>
+   //        						<Icon name='dropdown' />
+   //        						<strong>Season {season.season}</strong>
+   //      						</Accordion.Title>;
+			// let aContent =	<Accordion.Content>
+			// 									<Table  dataSource={antdData}
+			// 									columns= {antdColumns}
+			// 									/>
+			// 						 		</Accordion.Content>;
+			return <Collapse.Panel header={'Season ' + season.season} key={season.season}>
+												<Table dataSource={antdData}
+												columns= {antdColumns}
 												/>
-									 		</Accordion.Content>;
-					return ([aTitle,aContent]);
+												</Collapse.Panel>;
+					// return ([aTitle,aContent]);
 		});
 
 	//--------------------------------------
 		return (
-			<div>
+			<div className="tv-item-detail">
 				<div className="row">
 					<div className="shrink columns medium-4">
 						<div className="row">
 							<div className="columns medium-12">
-								<img src={tvShow.image} className="show-image"/>
+								<img src={tvShow.image} className="show-image" />
 							</div>
 							<div className="columns medium-12">
 								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.firebaseKey, showData.firebaseKey, tvShow.name)} className="button alert">Delete</a>
+								<a href="#" onClick={()=> startRefreshShowById(showSelectedId, tvShow.firebaseKey)} className="button primary">Refresh</a>
 							</div>
 						</div>
 					</div>
@@ -129,9 +156,9 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 				</div>
 
 				<TVUserData showData={showData} />
-				<Accordion>
-					{griddleComponents}
-				</Accordion>
+				<Collapse accordion>
+					{episodeAccordion}
+				</Collapse>
 			</div>
 		);
 	};
@@ -139,5 +166,6 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 // export default TVItemDetail;
 export default connect(null, {
 	startDeleteShow,
-	startDeleteGroupMember
+	startDeleteGroupMember,
+	startRefreshShowById
 })(TVItemDetail);
