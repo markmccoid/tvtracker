@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
+
 import { startDeleteShow, startDeleteGroupMember, startRefreshShowById } from '../actions/actions';
 import Griddle from 'griddle-react';
 require('semantic-ui-css/semantic');
 import { Accordion, Icon } from 'semantic-ui-react';
 import _ from 'lodash';
-import { Collapse } from 'antd';
-
-import { Table } from 'antd';
+import { Collapse, Badge, Table } from 'antd';
 
 var alertify = require('alertifyjs');
 
@@ -19,26 +19,42 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
   if (!tvShow) {
   	return <div></div>
   }
-	var onDeleteShow = (showId, tvShowFirebaseKey, showDataFirebaseKey, showName) => {
+  var getGroupsWithShow = () => {
 		//Find shows that are in the selected group and set up if we delete show.
-		//may be better to do it TVItemDetail
 		let groupsWithShow = [];
 		_.forEach(groups,(group) => {
-			let membersToDelete = _.filter(group.members,(member) => member.tvShowId === showSelectedId);
+			let memberInGroup = _.filter(group.members,(member) => member.tvShowId === showSelectedId);
 
-			if (membersToDelete.length > 0) {
+			if (memberInGroup.length > 0) {
 			groupsWithShow.push( {
-									memberFirebaseKey: membersToDelete[0].firebaseKey,
-									groupFirebaseKey: group.firebaseKey
+									memberFirebaseKey: memberInGroup[0].firebaseKey,
+									groupFirebaseKey: group.firebaseKey,
+									groupName: group.name
 								});
 			}
+			console.log('groupwshow', groupsWithShow);
 		});
+		return groupsWithShow;
+  };
+
+	var onDeleteShow = (showId, tvShowFirebaseKey, showDataFirebaseKey, showName) => {
+		//Find shows that are in the selected group and set up if we delete show.
+		// let groupsWithShow = [];
+		// _.forEach(groups,(group) => {
+		// 	let membersToDelete = _.filter(group.members,(member) => member.tvShowId === showSelectedId);
+
+		// 	if (membersToDelete.length > 0) {
+		// 	groupsWithShow.push( {
+		// 							memberFirebaseKey: membersToDelete[0].firebaseKey,
+		// 							groupFirebaseKey: group.firebaseKey
+		// 						});
+		// 	}
+		// });
 		//Get cofirmation of delete
 		alertify.confirm('', `Confirm Deletion of ${showName}`,
 									() => {
 										//find if show is a member in any group and delete it from the group
-										groupsWithShow.forEach((show) => {
-											console.log('deleting member', show.memberFirebaseKey);
+										getGroupsWithShow().forEach((show) => {
 											startDeleteGroupMember(show.memberFirebaseKey, show.groupFirebaseKey);
 										});
 										startDeleteShow(showId, tvShowFirebaseKey, showDataFirebaseKey);
@@ -58,26 +74,7 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 					</div>;
 
 	//-----------------------------------------
-	//--Setup Griddle Component to Show Episode
-		var griddleColumnMetadata = [
-			{"columnName": "episodeNumber",
-		    "order": 1,
-		    "locked": false,
-		    "visible": true,
-		    "displayName": "Episode #"
-		  },
-		  {"columnName": "episodeName",
-		    "order": 2,
-		    "locked": false,
-		    "visible": true,
-		    "displayName": "Name"
-		  },
-		  {"columnName": "episodeAirDate",
-		    "order": 3,
-		    "locked": false,
-		    "visible": true,
-		    "displayName": "Air Date"
-		  }];
+	//--Setup the antd Collapse Component to Show Episodes
 		var antdColumns = [{
 					title:'Episode #',
 					dataIndex: 'episodeNumber',
@@ -102,23 +99,27 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 							...episode
 						});
 				});
-			// let aTitle = <Accordion.Title>
-   //        						<Icon name='dropdown' />
-   //        						<strong>Season {season.season}</strong>
-   //      						</Accordion.Title>;
-			// let aContent =	<Accordion.Content>
-			// 									<Table  dataSource={antdData}
-			// 									columns= {antdColumns}
-			// 									/>
-			// 						 		</Accordion.Content>;
 			return <Collapse.Panel header={'Season ' + season.season} key={season.season}>
 												<Table dataSource={antdData}
 												columns= {antdColumns}
 												/>
 												</Collapse.Panel>;
-					// return ([aTitle,aContent]);
 		});
-
+		//function for group display JSX
+		var groupsDisplay = () => {
+			let groupsShowIsIn = getGroupsWithShow();
+			//If in no groups, don't show anything
+			// if ( groupsShowIsIn.length === 0 ) {
+			// 	return null;
+			// }
+			// console.log(groupsShowIsIn)
+			let groupList = groupsShowIsIn.map(group => group.groupName).join(', ');
+			return 	(
+				<div className="badge-groups">
+				Groups - <Link to="groupmanage" title={groupList}><span >{groupsShowIsIn.length}</span></Link>
+				</div>
+					);
+		};
 	//--------------------------------------
 		return (
 			<div className="tv-item-detail">
@@ -131,6 +132,7 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 							<div className="columns medium-12">
 								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.firebaseKey, showData.firebaseKey, tvShow.name)} className="button alert">Delete</a>
 								<a href="#" onClick={()=> startRefreshShowById(showSelectedId, tvShow.firebaseKey)} className="button primary">Refresh</a>
+								{groupsDisplay()}
 							</div>
 						</div>
 					</div>

@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+  	"start": "npm-run-all --parallel dev:*",
+    "dev:server": "node server.js",
+    "dev:webpack": "webpack -w",
     "test": "NODE_ENV=test karma start",
     "build": "webpack -p",
-    "postinstall": "webpack -p",
-    "start": "node server.js"
+    "postinstall": "webpack -p"
   },
   "author": "",
   "license": "ISC",
@@ -60,6 +62,7 @@
     "karma-webpack": "^1.7.0",
     "less": "^2.7.1",
     "less-loader": "^2.2.3",
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "npm-run-all": "^3.1.2"
   }
 }

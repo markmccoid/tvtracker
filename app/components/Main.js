@@ -1,6 +1,5 @@
 import React from 'react';
 import { connect } from 'react-redux';
-
 //Import Components
 import Navbar from 'Navbar';
 import MainDisplay from 'MainDisplay';
