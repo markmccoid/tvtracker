@@ -89,11 +89,7 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 		//dispatch action that will add member to firebase and redux
 		startAddGroupMember(newMemberObj, groupFirebaseKey);
 	}
-//--Delete show from Group members
-	var deleteFromMembers = (memberFirebaseKey, groupFirebaseKey) => {
-		console.log('delete',memberFirebaseKey, groupFirebaseKey);
-		startDeleteGroupMember(memberFirebaseKey, groupFirebaseKey);
-	}
+
 //----------------------------------------------------------------------------------
 	// //--GET NEXT EPISODE
 		var nextEpisodeObj = TVShowHelpers.getNextEpisode(tvShow);
@@ -144,18 +140,19 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 			// }
 			// console.log(groupsShowIsIn)
 			let groupList = groupsShowIsIn.map(group => group.groupName).join(', ');
-			let groupTagsJSX = groupsFlagged.map((group)=> {
+			let groupTagsJSX = _.orderBy(groupsFlagged, ['showInGroup','groupName'],['desc','asc']).map((group)=> {
 					return (
 					<CheckableTag
+						key={group.groupFirebaseKey}
 						checked={group.showInGroup}
-						onChange={() => group.showInGroup ? deleteFromMembers(group.memberFirebaseKey, group.groupFirebaseKey) : addToGroup(tvShow, group.groupFirebaseKey)}>
+						onChange={() => group.showInGroup ? startDeleteGroupMember(group.memberFirebaseKey, group.groupFirebaseKey) : addToGroup(tvShow, group.groupFirebaseKey)}>
 						{group.groupName}
 					</CheckableTag>
 						);
 				})
 			return 	(
-				<div className="badge-groups">
-				Groups - <Link to="groupmanage" title={groupList}><span >{groupsShowIsIn.length}</span></Link>
+				<div className="group-box">
+				<span>Groups -</span>
 				{groupTagsJSX}
 				</div>
 					);
@@ -172,9 +169,7 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 							<div className="columns medium-12">
 								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.firebaseKey, showData.firebaseKey, tvShow.name)} className="button alert">Delete</a>
 								<a href="#" onClick={()=> startRefreshShowById(showSelectedId, tvShow.firebaseKey)} className="button primary">Refresh</a>
-								<a href="#" onClick={()=> alert("Show Groups")} className="button primary">G</a>
-								{groupsDisplay()}
-
+								<a href="#" onClick={()=> alert("Supposed to show and hide groups below.")} className="button primary">G</a>
 							</div>
 						</div>
 					</div>
@@ -196,6 +191,12 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 								<div dangerouslySetInnerHTML={{__html: tvShow.summary}} className="summary"></div>
 							</div>
 						</div>
+					</div>
+				</div>
+
+				<div className="row">
+					<div className="columns">
+						{groupsDisplay()}
 					</div>
 				</div>
 

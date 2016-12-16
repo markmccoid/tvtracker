@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-  	"start": "npm-run-all --parallel dev:*",
+    "start": "npm-run-all --parallel dev:*",
     "dev:server": "node server.js",
     "dev:webpack": "webpack -w",
     "test": "NODE_ENV=test karma start",
@@ -32,6 +32,7 @@
     "foundation-sites": "^6.2.0",
     "griddle-react": "^0.7.0",
     "jquery": "^2.2.1",
+    "lodash": "^4.17.2",
     "node-sass": "^3.4.2",
     "node-uuid": "^1.4.7",
     "react": "^15.4.1",

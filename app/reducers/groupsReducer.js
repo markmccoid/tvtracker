@@ -67,9 +67,7 @@ export var groupsReducer = (state = [], action) => {
 			//If there are no members in group return empty array otherwise create new array with existing members
 			let delMembers = !delGroup.members ? delMembers = []: [...delGroup.members];
 			//return only members that DO NOT equal the one we want to delete
-			console.log('delmembers',delMembers);
 			let newMembers = delMembers.filter((member) => member.firebaseKey !== action.memberFirebaseKey);
-			console.log('reducer', newMembers, action.memberFirebaseKey);
 			//Return using the filter on state to only pick the items we DIDN’T change, then
 			//add the updated object on the end.  Doesn't keep array in order, but shouldn't matter for this one.
 			return (
