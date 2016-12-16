@@ -62,6 +62,8 @@ export var showDataReducer = (state = [], action) => {
 				updatedShow = {...showToUpdate, episodeWatching: value};
 			} else if (type === 's') {
 				updatedShow = {...showToUpdate, seasonWatching: value};
+			} else if (type === 'r') {
+				updatedShow = {...showToUpdate, episodeProgress: value};
 			}
 			return [
 				...state.slice(0,idx),

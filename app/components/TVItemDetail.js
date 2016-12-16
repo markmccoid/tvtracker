@@ -2,12 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
-import { startDeleteShow, startDeleteGroupMember, startRefreshShowById } from '../actions/actions';
+import { startDeleteShow, startDeleteGroupMember, startRefreshShowById, startAddGroupMember } from '../actions/actions';
 import Griddle from 'griddle-react';
 require('semantic-ui-css/semantic');
 import { Accordion, Icon } from 'semantic-ui-react';
 import _ from 'lodash';
-import { Collapse, Badge, Table } from 'antd';
+import { Collapse, Tag, Table } from 'antd';
+const CheckableTag = Tag.CheckableTag;
+
 
 var alertify = require('alertifyjs');
 
@@ -15,13 +17,14 @@ import helpers from '../helpers/helpers';
 import TVShowHelpers from '../helpers/TVShowHelpers';
 import TVUserData from 'TVUserData';
 
-const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGroupMember, startRefreshShowById, showData, groups }) => {
+const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGroupMember, startAddGroupMember, startRefreshShowById, showData, groups }) => {
   if (!tvShow) {
   	return <div></div>
   }
   var getGroupsWithShow = () => {
 		//Find shows that are in the selected group and set up if we delete show.
 		let groupsWithShow = [];
+		let groupsFlagged = [];
 		_.forEach(groups,(group) => {
 			let memberInGroup = _.filter(group.members,(member) => member.tvShowId === showSelectedId);
 
@@ -32,11 +35,20 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 									groupName: group.name
 								});
 			}
-			console.log('groupwshow', groupsWithShow);
-		});
-		return groupsWithShow;
-  };
 
+			groupsFlagged.push({
+				groupFirebaseKey: group.firebaseKey,
+				groupName: group.name,
+				memberFirebaseKey: memberInGroup.length > 0 ? memberInGroup[0].firebaseKey : undefined,
+				showInGroup: memberInGroup.length > 0 ? true : false
+			});
+
+		});
+		//console.log("groupsflagged", groupsFlagged);
+		return {groupsWithShow, groupsFlagged};
+  };
+//---------------
+//-DELETE SHOW
 	var onDeleteShow = (showId, tvShowFirebaseKey, showDataFirebaseKey, showName) => {
 		//Find shows that are in the selected group and set up if we delete show.
 		// let groupsWithShow = [];
@@ -54,7 +66,7 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 		alertify.confirm('', `Confirm Deletion of ${showName}`,
 									() => {
 										//find if show is a member in any group and delete it from the group
-										getGroupsWithShow().forEach((show) => {
+										getGroupsWithShow().groupsWithShow.forEach((show) => {
 											startDeleteGroupMember(show.memberFirebaseKey, show.groupFirebaseKey);
 										});
 										startDeleteShow(showId, tvShowFirebaseKey, showDataFirebaseKey);
@@ -65,7 +77,24 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
               			alertify.error(`Canceled delete of ${showName}`)
               		});
 	};
-
+//----------------------------------------------------------------------------------
+//--Add show to Group
+	var addToGroup = (show, groupFirebaseKey) => {
+		let {firebaseKey, name, id} = show;
+		let newMemberObj = {
+			tvShowFirebaseKey: firebaseKey,
+			tvShowName: name,
+			tvShowId: id
+		};
+		//dispatch action that will add member to firebase and redux
+		startAddGroupMember(newMemberObj, groupFirebaseKey);
+	}
+//--Delete show from Group members
+	var deleteFromMembers = (memberFirebaseKey, groupFirebaseKey) => {
+		console.log('delete',memberFirebaseKey, groupFirebaseKey);
+		startDeleteGroupMember(memberFirebaseKey, groupFirebaseKey);
+	}
+//----------------------------------------------------------------------------------
 	// //--GET NEXT EPISODE
 		var nextEpisodeObj = TVShowHelpers.getNextEpisode(tvShow);
 		var nextEpisodeBlock = <div className="columns small-4 callout small secondary">
@@ -107,16 +136,27 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 		});
 		//function for group display JSX
 		var groupsDisplay = () => {
-			let groupsShowIsIn = getGroupsWithShow();
+			let groupsFlagged = getGroupsWithShow().groupsFlagged;
+			let groupsShowIsIn = getGroupsWithShow().groupsWithShow;
 			//If in no groups, don't show anything
 			// if ( groupsShowIsIn.length === 0 ) {
 			// 	return null;
 			// }
 			// console.log(groupsShowIsIn)
 			let groupList = groupsShowIsIn.map(group => group.groupName).join(', ');
+			let groupTagsJSX = groupsFlagged.map((group)=> {
+					return (
+					<CheckableTag
+						checked={group.showInGroup}
+						onChange={() => group.showInGroup ? deleteFromMembers(group.memberFirebaseKey, group.groupFirebaseKey) : addToGroup(tvShow, group.groupFirebaseKey)}>
+						{group.groupName}
+					</CheckableTag>
+						);
+				})
 			return 	(
 				<div className="badge-groups">
 				Groups - <Link to="groupmanage" title={groupList}><span >{groupsShowIsIn.length}</span></Link>
+				{groupTagsJSX}
 				</div>
 					);
 		};
@@ -132,7 +172,9 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 							<div className="columns medium-12">
 								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.firebaseKey, showData.firebaseKey, tvShow.name)} className="button alert">Delete</a>
 								<a href="#" onClick={()=> startRefreshShowById(showSelectedId, tvShow.firebaseKey)} className="button primary">Refresh</a>
+								<a href="#" onClick={()=> alert("Show Groups")} className="button primary">G</a>
 								{groupsDisplay()}
+
 							</div>
 						</div>
 					</div>
@@ -169,5 +211,6 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 export default connect(null, {
 	startDeleteShow,
 	startDeleteGroupMember,
+	startAddGroupMember,
 	startRefreshShowById
 })(TVItemDetail);

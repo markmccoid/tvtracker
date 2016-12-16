@@ -7,7 +7,7 @@
     "dev:server": "node server.js",
     "dev:webpack": "webpack -w",
     "test": "NODE_ENV=test karma start",
-    "build": "webpack -p",
+    "build": "NODE_ENV=production webpack -p",
     "postinstall": "webpack -p"
   },
   "author": "",

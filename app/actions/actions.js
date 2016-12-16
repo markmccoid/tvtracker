@@ -74,6 +74,7 @@ export var startAddShowById= (showId) => {
 				episodeDownloading: 1,
 				seasonWatching: 1,
 				episodeWatching: 1,
+				episodeProgress: 'watched',
 				showNotes: '',
 				showLinks: [{link:showObj.imdbLink,
 											linkDescription: `IMDB Entry for ${showObj.name}`},
@@ -209,11 +210,22 @@ export var onWatchingChange = (type, value, showSelected) => {
 export var startOnWatchingChange = (type, value, showSelected, firebaseKey) => {
 	return (dispatch, getState) => {
 		var updType;
-		if ( type === 'e' ) {
-			updType = {episodeWatching: value};
-		} else {
-			updType = {seasonWatching: value};
+		switch (type) {
+			case 'e':
+				updType = {episodeWatching: value};
+				break;
+			case 's':
+				updType = {seasonWatching: value};
+				break;
+			case 'r':
+				updType = {episodeProgress: value};
+				break;
 		}
+		// if ( type === 'e' ) {
+		// 	updType = {episodeWatching: value};
+		// } else  {
+		// 	updType = {seasonWatching: value};
+		// }
 		var uid = getState().auth.uid;
 		var showUpdateRef = firebaseRef.child(`users/${uid}/showData/${firebaseKey}`).update(updType);
 

@@ -75,24 +75,26 @@ class TVUserData extends React.Component {
 				</div>
 			</div>
 			<div className="row">
-				<div className="columns medium-3">
-					<p className="detail-title">Season DL</p>
+				<div className="columns medium-2">
+					<p className="detail-title">Season Downloaded</p>
 					<input
 						type="number"
 						value={showData.seasonDownloading}
 						onChange={(event) => startOnDownloadChange('s', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
 				</div>
-				<div className="columns medium-3">
-					<p className="detail-title">Episode DL</p>
+				<div className="columns medium-2">
+					<p className="detail-title">Episode Downloaded</p>
 					<input
 						type="number"
 						value={showData.episodeDownloading}
 						onChange={(event) => startOnDownloadChange('e', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
 				</div>
+				<div className="columns medium-2">
+				</div>
 
-				<div className="columns medium-3" style={{borderLeft:"1px solid #ccc"}}>
+				<div className="columns medium-2" style={{borderLeft:"1px solid #ccc"}}>
 					<p className="detail-title">Season Watching</p>
 					<input
 						type="number"
@@ -100,13 +102,26 @@ class TVUserData extends React.Component {
 						onChange={(event) => startOnWatchingChange('s', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
 				</div>
-				<div className="columns medium-3">
+				<div className="columns medium-2">
 					<p className="detail-title">Episode Watching</p>
 					<input
 						type="number"
 						value={showData.episodeWatching}
 						onChange={(event) => startOnWatchingChange('e', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
+				</div>
+				<div className="columns medium-2">
+					<p className="detail-title" style={{borderBottom: "0"}}>Progress Watching</p>
+				  <input 	type="radio"
+				  				name="rWatching"
+				  				value="watched"
+				  				checked={showData.episodeProgress === 'watched'}
+				  				onChange={(event) => startOnWatchingChange('r', event.target.value, showData.showId, showData.firebaseKey)}/> Watched<br />
+				  <input 	type="radio"
+				  				name="rWatching"
+				  				value="inProgress"
+									checked={showData.episodeProgress === 'inProgress'}
+				  				onChange={(event) => startOnWatchingChange('r', event.target.value, showData.showId, showData.firebaseKey)}/> In Progress
 				</div>
 			</div>
 		</div>;
