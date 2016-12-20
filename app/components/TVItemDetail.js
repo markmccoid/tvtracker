@@ -3,9 +3,9 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router';
 
 import { startDeleteShow, startDeleteGroupMember, startRefreshShowById, startAddGroupMember } from '../actions/actions';
-import Griddle from 'griddle-react';
-require('semantic-ui-css/semantic');
-import { Accordion, Icon } from 'semantic-ui-react';
+// import Griddle from 'griddle-react';
+// require('semantic-ui-css/semantic');
+// import { Accordion, Icon } from 'semantic-ui-react';
 import _ from 'lodash';
 import { Collapse, Tag, Table } from 'antd';
 const CheckableTag = Tag.CheckableTag;
@@ -16,6 +16,7 @@ var alertify = require('alertifyjs');
 import helpers from '../helpers/helpers';
 import TVShowHelpers from '../helpers/TVShowHelpers';
 import TVUserData from 'TVUserData';
+import TVItemSeasons from 'TVItemSeasons';
 
 const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGroupMember, startAddGroupMember, startRefreshShowById, showData, groups }) => {
   if (!tvShow) {
@@ -98,38 +99,6 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 						<p>{nextEpisodeObj.date} | {nextEpisodeObj.number}</p>
 					</div>;
 
-	//-----------------------------------------
-	//--Setup the antd Collapse Component to Show Episodes
-		var antdColumns = [{
-					title:'Episode #',
-					dataIndex: 'episodeNumber',
-					key: 'episodeNumber'
-				},{
-					title:'Name',
-					dataIndex: 'episodeName',
-					key: 'episodeName'
-				},{
-					title:'Air Date',
-					dataIndex: 'episodeAirDate',
-					key: 'episodeAirDate'
-				}];
-		var sortedSeasons = [...tvShow.seasonData];
-		sortedSeasons.sort((a,b) => b.season-a.season);
-
-		var episodeAccordion = sortedSeasons.map((season) => {
-		var antdData = season.episodeDetail.map((episode) => {
-					return (
-						{
-							key: episode.episodeNumber,
-							...episode
-						});
-				});
-			return <Collapse.Panel header={'Season ' + season.season} key={season.season}>
-												<Table dataSource={antdData}
-												columns= {antdColumns}
-												/>
-												</Collapse.Panel>;
-		});
 		//function for group display JSX
 		var groupsDisplay = () => {
 			let groupsFlagged = getGroupsWithShow().groupsFlagged;
@@ -201,9 +170,7 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 				</div>
 
 				<TVUserData showData={showData} />
-				<Collapse accordion>
-					{episodeAccordion}
-				</Collapse>
+				<TVItemSeasons tvShow={tvShow} />
 			</div>
 		);
 	};

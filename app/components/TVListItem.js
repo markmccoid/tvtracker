@@ -29,4 +29,11 @@ class TVListItem extends React.Component {
 	}
 };
 
+TVListItem.propTypes = {
+	tvShow: React.PropTypes.object,
+	showData: React.PropTypes.object,
+	showSelectedId: React.PropTypes.number,
+	onSelectShow: React.PropTypes.func
+}
+
 export default TVListItem;

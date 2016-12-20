@@ -1,6 +1,6 @@
 import { SHOW_SELECTED, ADD_SHOW_BY_ID, ON_DELETE_SHOW } from '../actions/actions';
 
-export var showSelectedReducer = (state = '', action) => {
+export var showSelectedReducer = (state = null, action) => {
 	switch (action.type) {
 		case SHOW_SELECTED:
 			return action.payload;
@@ -8,7 +8,7 @@ export var showSelectedReducer = (state = '', action) => {
 		case ADD_SHOW_BY_ID:
 			return 	action.payload.tvShow.id;
 		case ON_DELETE_SHOW:
-			return '';
+			return null;
 		default:
 			return state;
 	}

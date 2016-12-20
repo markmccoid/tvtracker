@@ -33,4 +33,7 @@ var Navbar = ({dispatch, tvShows}) => {
 	);
 };
 
+Navbar.propTypes = {
+	tvShows: React.PropTypes.array
+}
 export default connect()(Navbar);

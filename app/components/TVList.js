@@ -1,13 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-require('semantic-ui-css/semantic');
-import { Accordion, Icon } from 'semantic-ui-react';
+// require('semantic-ui-css/semantic');
+// import { Accordion, Icon } from 'semantic-ui-react';
 import { Collapse } from 'antd';
-
 
 import _ from 'lodash';
 
 import TVListItem from 'TVListItem';
+import TVSearchBox from 'TVSearchBox';
 import tvMaze from './../api/tvMaze';
 import { loadNewShows, showSelected, addingNewShow, setNewShowFlag } from '../actions/actions';
 import helpers from '../helpers/helpers';
@@ -15,22 +15,45 @@ import helpers from '../helpers/helpers';
 class TVList extends React.Component {
 	constructor(props) {
 		super(props);
+
+		this.state = {
+			searchText: ''
+		}
+	}
+
+	onSearch = (searchText) => {
+		this.setState({searchText});
 	}
 
 	render() {
 		var { tvShows, showData } = this.props;
+		//let tvShows = [];
+		//Handle search string searching
+		let searchText = this.state.searchText;
+		if (searchText.length > 0) {
+			//convert input string to a regular expression object to pass to match function
+			let reSearchString = new RegExp(searchText, "g");
+			tvShows = this.props.tvShows.filter(function(show){
+				if (show.name) {
+					return show.name.toLowerCase().match(reSearchString);
+				}
+			});
+		}
+
 		//For antd accordion
 		const Panel = Collapse.Panel;
 		//Since we are modifying groups, need a new array of groups to work with.
 		var groups = [...this.props.groups];
-		groups.push({
-			name: "All",
-			description: "Default list of all shows",
-			firebaseKey: '',
-			members: tvShows.map((show) => ({tvShowFirebaseKey: show.firebaseKey, tvShowName: show.name, tvShowId: show.id})),
-			sort: groups.length + 1
-		});
-
+		//If we have at least one group then push an "All" group
+		if (groups.length > 0) {
+			groups.push({
+				name: "All",
+				description: "Default list of all shows",
+				firebaseKey: '',
+				members: tvShows.map((show) => ({tvShowFirebaseKey: show.firebaseKey, tvShowName: show.name, tvShowId: show.id})),
+				sort: groups.length + 1
+			});
+		}
 		//Create a new array of sorted TVShow objects
 		//let tvShowsSorted = [...tvShows].sort((a,b) => helpers.objectSort(a,b, 'name'));
 		let tvShowsSorted = _.sortBy([...tvShows],'name');
@@ -53,12 +76,14 @@ class TVList extends React.Component {
 				let groupsSorted = _.sortBy([...groups], 'sort');
 				// let groupsSorted = [...groups];
 				// groupsSorted.sort((a,b) => helpers.objectSort(a,b, 'sort'));
-				getTVListItems = groupsSorted.map((group) => {
-					// let groupHeader = <Accordion.Title>
-				 //          						<Icon name='dropdown' />
-				 //          						<strong>{group.name}</strong>
-				 //        						</Accordion.Title>;
-				  var sortedMembers = _.sortBy([...group.members], 'tvShowName');
+				let getTVListItemsHold = groupsSorted.map((group) => {
+				  //var sortedMembers = _.sortBy([...group.members], 'tvShowName');
+				  var sortedMembers = _([...group.members], 'tvShowName')
+				  															.sortBy()
+				  															.filter(member => {
+				  																return _.find(tvShows, function (show) {return member.tvShowName === show.name;}) !== undefined;
+				  															}).value();
+				console.log('sortedMembers', sortedMembers);
 					// var sortedMembers = [...group.members];
 					// sortedMembers.sort((a,b) => helpers.objectSort(a,b, 'tvShowName'));
 
@@ -81,6 +106,7 @@ class TVList extends React.Component {
 														</Panel>;
 					return [wrappedList];
 				});
+				getTVListItems = <Collapse accordion>{getTVListItemsHold}</Collapse>
 			} else {
 				//If we have no groups, just render the sorted tv Show list
 				getTVListItems = tvShowsSorted.map((tvShow) => {
@@ -93,6 +119,7 @@ class TVList extends React.Component {
 														key={tvShow.id}/>
 							);
 						});
+				getTVListItems = <ul className="menu vertical"> {getTVListItems} </ul>
 			}
 		}
 
@@ -109,15 +136,24 @@ class TVList extends React.Component {
 	        			Add New Show
 	        		</button>
 	        </div>
+	        <div>
+	        	<TVSearchBox onSearch={this.onSearch} />
+	        </div>
 				</div>
 				<hr />
-				<Collapse accordion>
+
 					{getTVListItems}
-				</Collapse>
+
 			</div>
 		);
 	}
 };
+
+TVList.propTypes = {
+	tvShows: React.PropTypes.array,
+	showData: React.PropTypes.array,
+	groups: React.PropTypes.array
+}
 
 function mapStateToProps(state) {
 	return {

@@ -14,10 +14,11 @@ import helpers from '../helpers/helpers';
 class MainDisplay extends React.Component {
 	constructor(props) {
 		super(props);
-
 	}
 
 	render() {
+		let tvShows = [...this.props.tvShows];
+
 		//determine if we should show the TVItemDetail or the AddTVShow
 		var detailPane = () => {
 //			console.log(this.props.tvShows, this.props.showSelectedId);
@@ -34,7 +35,7 @@ class MainDisplay extends React.Component {
 		return (
 			<div className="row">
 				<div className="columns small-4" style={{paddingRight: "0", marginBottom:"0px"}}>
-					<TVList tvShows={this.props.tvShows} showData={this.props.showData} groups={this.props.groups}/>
+					<TVList tvShows={tvShows} showData={this.props.showData} groups={this.props.groups}/>
 				</div>
 				<div className="columns callout secondary" style={{marginLeft: "-1px", marginRight: "15px", marginBottom:"0px"}}>
 					{detailPane()}
@@ -43,6 +44,14 @@ class MainDisplay extends React.Component {
 		);
 	}
 };
+
+MainDisplay.propTypes = {
+		tvShows: React.PropTypes.array,
+		showData: React.PropTypes.array,
+		showSelectedId: React.PropTypes.number,
+		newShowsInfo: React.PropTypes.object,
+		groups: React.PropTypes.array
+}
 
 function mapStateToProps(state) {
 	return {

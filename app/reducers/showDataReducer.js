@@ -35,9 +35,9 @@ export var showDataReducer = (state = [], action) => {
 				//These sub object are STILL pointing to the original state object, thus, if we update anything in
 				//these sub objects, we will be mutating the original object.
 				//So to keep this from happening we are doing all the shit below!
-				updatedShow = {...showToUpdate, episodeDownloading: value};
+				updatedShow = {...showToUpdate, episodeDownloading: parseInt(value)};
 			} else if (type === 's') {
-				updatedShow = {...showToUpdate, seasonDownloading: value};
+				updatedShow = {...showToUpdate, seasonDownloading: parseInt(value)};
 			}
 			return [
 				...state.slice(0,idx),
@@ -59,9 +59,9 @@ export var showDataReducer = (state = [], action) => {
 				//These sub object are STILL pointing to the original state object, thus, if we update anything in
 				//these sub objects, we will be mutating the original object.
 				//So to keep this from happening we are doing all the shit below!
-				updatedShow = {...showToUpdate, episodeWatching: value};
+				updatedShow = {...showToUpdate, episodeWatching: parseInt(value)};
 			} else if (type === 's') {
-				updatedShow = {...showToUpdate, seasonWatching: value};
+				updatedShow = {...showToUpdate, seasonWatching: parseInt(value)};
 			} else if (type === 'r') {
 				updatedShow = {...showToUpdate, episodeProgress: value};
 			}
