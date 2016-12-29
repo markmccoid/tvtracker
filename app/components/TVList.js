@@ -17,22 +17,30 @@ class TVList extends React.Component {
 		super(props);
 
 		this.state = {
-			searchText: ''
+			searchText: '',
+			showSearchBox: false
 		}
 	}
 
 	onSearch = (searchText) => {
+		//Set the state to the text user is searching for
+		//Will cause a rerender and filtering of tvShows based on search text
 		this.setState({searchText});
 	}
-
+	onShowSearch = () => {
+		this.setState({showSearchBox: true});
+	}
 	render() {
 		var { tvShows, showData } = this.props;
-		//let tvShows = [];
+		//set variable so we know if we are searching i.e. if we are, don't show groups
+		let searchingFlag = false;
 		//Handle search string searching
 		let searchText = this.state.searchText;
 		if (searchText.length > 0) {
+			//set variable so we know we are searching -- don't show groups
+			searchingFlag = true;
 			//convert input string to a regular expression object to pass to match function
-			let reSearchString = new RegExp(searchText, "g");
+			let reSearchString = new RegExp(searchText.toLowerCase(), "g");
 			tvShows = this.props.tvShows.filter(function(show){
 				if (show.name) {
 					return show.name.toLowerCase().match(reSearchString);
@@ -72,18 +80,20 @@ class TVList extends React.Component {
 			//If there are groups, then render with groups/
 			//Need to have a default "All" group that always exists in the group array
 			//Could create programatically here or put in store..  Programatically probably easier/better
-			if (groups.length > 0){
+			if (groups.length > 0 && !searchingFlag){
 				let groupsSorted = _.sortBy([...groups], 'sort');
 				// let groupsSorted = [...groups];
 				// groupsSorted.sort((a,b) => helpers.objectSort(a,b, 'sort'));
 				let getTVListItemsHold = groupsSorted.map((group) => {
-				  //var sortedMembers = _.sortBy([...group.members], 'tvShowName');
+
+				  //Could probably just use this:: var sortedMembers = _.sortBy([...group.members], 'tvShowName');
+				  //Since we are bypassing building groups when searching.  However the below ensures that only members
+				  //that are in the tvShows array passed into TVList component will be shown in group.
 				  var sortedMembers = _([...group.members], 'tvShowName')
 				  															.sortBy()
 				  															.filter(member => {
 				  																return _.find(tvShows, function (show) {return member.tvShowName === show.name;}) !== undefined;
 				  															}).value();
-				console.log('sortedMembers', sortedMembers);
 					// var sortedMembers = [...group.members];
 					// sortedMembers.sort((a,b) => helpers.objectSort(a,b, 'tvShowName'));
 
@@ -123,6 +133,13 @@ class TVList extends React.Component {
 			}
 		}
 
+		let searchBoxJSX;
+		if (this.state.showSearchBox) {
+			searchBoxJSX = <TVSearchBox onSearch={this.onSearch} onClear={() => this.setState({showSearchBox: false})}/>;
+		} else {
+			searchBoxJSX = <h5 style={{cursor: "pointer", border:"1px solid gray", textAlign:"center"}} onClick={() => this.setState({showSearchBox: true})}>Search</h5>;
+		}
+
 		return (
 			<div className="callout secondary tv-list" style={{height:"100%"}}>
 				<div>
@@ -137,7 +154,7 @@ class TVList extends React.Component {
 	        		</button>
 	        </div>
 	        <div>
-	        	<TVSearchBox onSearch={this.onSearch} />
+	        	{searchBoxJSX}
 	        </div>
 				</div>
 				<hr />
