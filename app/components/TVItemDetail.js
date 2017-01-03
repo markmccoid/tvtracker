@@ -138,7 +138,6 @@ const TVItemDetail = ({ tvShow, showSelectedId, startDeleteShow, startDeleteGrou
 							<div className="columns medium-12">
 								<a href="#" onClick={()=> onDeleteShow(showSelectedId, tvShow.firebaseKey, showData.firebaseKey, tvShow.name)} className="button alert">Delete</a>
 								<a href="#" onClick={()=> startRefreshShowById(showSelectedId, tvShow.firebaseKey)} className="button primary">Refresh</a>
-								<a href="#" onClick={()=> alert("Supposed to show and hide groups below.")} className="button primary">G</a>
 							</div>
 						</div>
 					</div>

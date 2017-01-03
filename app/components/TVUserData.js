@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import { startOnDownloadChange, startOnWatchingChange, startAddUserLink, startOnLinkDelete, startAddShowNotes, addShowNotes } from '../actions/actions';
 import Link from 'Link';
+import ShowSource from './ShowSource';
 
 class TVUserData extends React.Component {
 		constructor(props) {
@@ -128,6 +129,7 @@ class TVUserData extends React.Component {
 	return (
 		<div>
 			{downloadingJSX}
+			<ShowSource />
 			<a onClick={() => {
 						this.setState({
 							showAddLink: !this.state.showAddLink,
