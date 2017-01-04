@@ -24,6 +24,7 @@ export const ON_DELETE_SHOW = 'ON_DELETE_SHOW';
 export const ADD_USER_LINK = 'ADD_USER_LINK';
 export const DELETE_USER_LINK = 'DELETE_USER_LINK';
 export const ADD_SHOW_NOTES = 'ADD_SHOW_NOTES';
+export const ADD_SHOW_SOURCE = 'ADD_SHOW_SOURCE';
 
 //Group Actions
 export const ADD_GROUP = 'ADD_GROUP';
@@ -76,6 +77,7 @@ export var startAddShowById= (showId) => {
 				episodeWatching: 1,
 				episodeProgress: 'watched',
 				showNotes: '',
+				showSource: 'download',
 				showLinks: [{link:showObj.imdbLink,
 											linkDescription: `IMDB Entry for ${showObj.name}`},
 										{link:showObj.downloadLink,
@@ -167,7 +169,7 @@ export var loadNewShows = (searchTerm) => {
 export var onDownloadChange = (type, value, showSelected) => {
 	const action = {
 		type: type,
-		value: value,
+		value: parseInt(value),
 		showSelected: showSelected
 	};
 	return {
@@ -180,9 +182,9 @@ export var startOnDownloadChange = (type, value, showSelected, firebaseKey) => {
 	return (dispatch, getState) => {
 		var updType;
 		if ( type === 'e' ) {
-			updType = {episodeDownloading: value};
+			updType = {episodeDownloading: parseInt(value)};
 		} else {
-			updType = {seasonDownloading: value};
+			updType = {seasonDownloading: parseInt(value)};
 		}
 		var uid = getState().auth.uid;
 		var showUpdateRef = firebaseRef.child(`users/${uid}/showData/${firebaseKey}`).update(updType);
@@ -198,7 +200,7 @@ export var startOnDownloadChange = (type, value, showSelected, firebaseKey) => {
 export var onWatchingChange = (type, value, showSelected) => {
 	const action = {
 		type: type,
-		value: value,
+		value: parseInt(value),
 		showSelected: showSelected
 	};
 	return {
@@ -212,13 +214,13 @@ export var startOnWatchingChange = (type, value, showSelected, firebaseKey) => {
 		var updType;
 		switch (type) {
 			case 'e':
-				updType = {episodeWatching: value};
+				updType = {episodeWatching: parseInt(value)};
 				break;
 			case 's':
-				updType = {seasonWatching: value};
+				updType = {seasonWatching: parseInt(value)};
 				break;
 			case 'r':
-				updType = {episodeProgress: value};
+				updType = {episodeProgress: parseInt(value)};
 				break;
 		}
 		// if ( type === 'e' ) {
@@ -353,6 +355,28 @@ export var startAddShowNotes = (showNotes, showSelected, firebaseKey) => {
 	};
 };
 //------- END - ADD SHOW NOTES GROUP ------------
+
+//------- ADD SHOW SOURCE GROUP ------------
+export var addShowSource = (showSelected, showSource) => {
+	return {
+		type: ADD_SHOW_SOURCE,
+		showSelected: showSelected,
+		payload: showSource
+	};
+};
+
+export var startAddShowSource = (showSource, showSelected, firebaseKey) => {
+	return (dispatch, getState) => {
+		var uid = getState().auth.uid;
+
+		var updNotesRef = firebaseRef.child(`users/${uid}/showData/${firebaseKey}`).update({showSource});
+
+		updNotesRef.then(() => {
+			dispatch(addShowSource(showSelected, showSource));
+		});
+	};
+};
+//------- END - ADD SHOW SOURCE GROUP ------------
 
 //----- GROUPS Actions --------------------------------
 export var addGroup = (newGroup, firebaseKey) => {

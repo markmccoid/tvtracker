@@ -1,9 +1,15 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { startOnDownloadChange, startOnWatchingChange, startAddUserLink, startOnLinkDelete, startAddShowNotes, addShowNotes } from '../actions/actions';
+import { startOnDownloadChange,
+					startOnWatchingChange,
+					startAddUserLink,
+					startOnLinkDelete,
+					startAddShowSource,
+					startAddShowNotes,
+					addShowNotes } from '../actions/actions';
 import Link from 'Link';
-import ShowSource from './ShowSource';
+import TVShowSource from './TVShowSource';
 
 class TVUserData extends React.Component {
 		constructor(props) {
@@ -21,9 +27,8 @@ class TVUserData extends React.Component {
 	}
 
 	render() {
-	var { showData, startOnDownloadChange, startOnWatchingChange, startOnLinkDelete, startAddShowNotes, addShowNotes } = this.props;
+	var { showData, startOnDownloadChange, startOnWatchingChange, startOnLinkDelete, startAddShowSource, startAddShowNotes, addShowNotes } = this.props;
 	//console.log(showData);
-
 
 	var addLinkForm =
 				<form onSubmit={(e)=> {
@@ -64,36 +69,46 @@ class TVUserData extends React.Component {
 				</div>
 			</div>
 			</form>;
-
-	var downloadingJSX =
-		<div className="callout" style={{paddingTop:0, paddingBottom: 0}}>
-			<div className="row">
-				<div className="column small-6">
-					<h4 className="text-center">Last Downloaded</h4>
-				</div>
-				<div className="column small-6" style={{borderLeft:"1px solid #ccc"}}>
-					<h4 className="text-center">Watching</h4>
-				</div>
-			</div>
-			<div className="row">
-				<div className="columns medium-2">
+	//If showSource download, then this guy
+	let downloadSection1JSX =
+				<div className="columns medium-2" key="1">
 					<p className="detail-title">Season Downloaded</p>
 					<input
 						type="number"
 						value={showData.seasonDownloading}
 						onChange={(event) => startOnDownloadChange('s', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
-				</div>
-				<div className="columns medium-2">
+				</div>;
+	let downloadSection2JSX =
+				<div className="columns medium-2"  key="2">
 					<p className="detail-title">Episode Downloaded</p>
 					<input
 						type="number"
 						value={showData.episodeDownloading}
 						onChange={(event) => startOnDownloadChange('e', event.target.value, showData.showId, showData.firebaseKey)}
 						/>
+				</div>;
+	let downloadSection3JSX = <div className="columns medium-2" key="3"></div>;
+	let downloadSectionJSX = [downloadSection1JSX, downloadSection2JSX, downloadSection3JSX];
+	let otherSectionJSX = <div className="columns medium-6" style={{ alignItems: "center" }}><img src={`./images/${showData.showSource}.png`} height='150px'  /></div>;
+
+	let downloadWatchingJSX =
+		<div className="callout" style={{paddingTop:0, paddingBottom: 0}}>
+
+			<div className="row">
+				<div className="column small-6">
+					<TVShowSource
+						onShowSourceChange={showSource => startAddShowSource(showSource, showData.showId, showData.firebaseKey)}
+						showSource={showData.showSource ? showData.showSource : 'download' }
+					/>
 				</div>
-				<div className="columns medium-2">
+				<div className="column small-6" style={{borderLeft:"1px solid #ccc"}}>
+					<h4 className="text-center">Watching</h4>
 				</div>
+			</div>
+			<div className="row">
+
+				{showData.showSource === 'download' ? downloadSectionJSX : otherSectionJSX}
 
 				<div className="columns medium-2" style={{borderLeft:"1px solid #ccc"}}>
 					<p className="detail-title">Season Watching</p>
@@ -128,8 +143,8 @@ class TVUserData extends React.Component {
 		</div>;
 	return (
 		<div>
-			{downloadingJSX}
-			<ShowSource />
+			{downloadWatchingJSX}
+
 			<a onClick={() => {
 						this.setState({
 							showAddLink: !this.state.showAddLink,
@@ -171,6 +186,7 @@ export default connect(null, {
 	startOnWatchingChange,
 	startAddUserLink,
 	startOnLinkDelete,
+	startAddShowSource,
 	startAddShowNotes,
 	addShowNotes
 })(TVUserData);

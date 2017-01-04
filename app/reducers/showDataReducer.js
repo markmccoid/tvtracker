@@ -124,6 +124,22 @@ export var showDataReducer = (state = [], action) => {
 				updatedShowData,
 				...state.slice(idx+1)
 				];
+		case C.ADD_SHOW_SOURCE:
+			console.log('adding Show Source-Action', action);
+			var { showSelected, payload } = action;
+			//Find show being edited's index
+			var idx = state.findIndex((showData) => {return showData.showId === showSelected});
+			//Get the show data to update ... will be an object
+			var showToUpdate = state.slice(idx, idx+1)[0];
+			//
+			var updatedShowData = {...showToUpdate, showSource: payload};
+
+			return [
+				...state.slice(0,idx),
+				updatedShowData,
+				...state.slice(idx+1)
+				];
+			return state;
 		case C.LOGOUT:
 			return [];
 		default:
